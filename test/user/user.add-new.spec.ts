@@ -3,10 +3,10 @@ import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { AppModule } from '../../src/app.module';
-import { AddNewUserRequest } from '../../src/dto/user.dto';
 import { TestModule } from '../test.module';
 import { TestService } from '../test.service';
 import { Logger } from 'winston';
+import { AddNewUserDto } from 'src/user/dto/add-new-user.dto';
 
 describe('User Controller - add new user', () => {
   let app: INestApplication;
@@ -31,7 +31,7 @@ describe('User Controller - add new user', () => {
     });
 
     it('should be rejected if request is invalid', async () => {
-      const data: AddNewUserRequest = {
+      const data: AddNewUserDto = {
         id: '',
         password: '',
         name: '',
@@ -49,7 +49,7 @@ describe('User Controller - add new user', () => {
     });
 
     it('should be able to add new user', async () => {
-      const data: AddNewUserRequest = {
+      const data: AddNewUserDto = {
         id: 'zs8565',
         password: 'zs8565',
         name: 'Mordekhai Gerin',
@@ -70,7 +70,7 @@ describe('User Controller - add new user', () => {
     it('should be fail inserting new user if user exist', async () => {
       await testService.createUser();
 
-      const data: AddNewUserRequest = {
+      const data: AddNewUserDto = {
         id: 'zs8565',
         password: 'zs8565',
         name: 'Mordekhai Gerin',

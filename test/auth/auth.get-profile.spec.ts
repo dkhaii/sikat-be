@@ -6,7 +6,7 @@ import { AppModule } from '../../src/app.module';
 import { TestModule } from '../test.module';
 import { TestService } from '../test.service';
 import { Logger } from 'winston';
-import { LoginRequest } from '../../src/dto/user.dto';
+import { LoginDto } from 'src/auth/dto/login.dto';
 
 describe('Auth Controller - login', () => {
   let app: INestApplication;
@@ -32,7 +32,7 @@ describe('Auth Controller - login', () => {
     });
 
     it('should be rejected if no authenticated user', async () => {
-      const data: LoginRequest = {
+      const data: LoginDto = {
         id: 'zs8565',
         password: 'zs8565',
       };
@@ -54,7 +54,7 @@ describe('Auth Controller - login', () => {
     });
 
     it('should be able to get authenticated user profile', async () => {
-      const data: LoginRequest = {
+      const data: LoginDto = {
         id: 'zs8565',
         password: 'zs8565',
       };

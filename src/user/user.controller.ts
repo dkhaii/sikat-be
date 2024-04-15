@@ -2,14 +2,16 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   HttpCode,
   HttpStatus,
   Param,
   Post,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { AddNewUserRequest, UserResponse } from '../dto/user.dto';
 import { WebResponse } from '../dto/web.dto';
+import { AddNewUserDto } from './dto/add-new-user.dto';
+import { UserDto } from './dto/user.dto';
 
 @Controller('/api/auth/users')
 export class UserController {
@@ -18,12 +20,10 @@ export class UserController {
 
   @Post()
   @HttpCode(HttpStatus.OK)
-  async addNew(
-    @Body() request: AddNewUserRequest,
-  ): Promise<WebResponse<UserResponse>> {
-    const newUser = await this.userService.addNew(request);
+  async addNew(@Body() dto: AddNewUserDto): Promise<WebResponse<UserDto>> {
+    const newUser = await this.userService.addNew(dto);
 
-    const response: WebResponse<UserResponse> = {
+    const response: WebResponse<UserDto> = {
       message: 'success add new user',
       data: newUser,
     };
@@ -38,6 +38,19 @@ export class UserController {
 
     const response: WebResponse<string> = {
       message: 'success delete user',
+    };
+
+    return response;
+  }
+
+  @Get()
+  @HttpCode(HttpStatus.OK)
+  async showAll(): Promise<WebResponse<UserDto[]>> {
+    const users = await this.userService.showAll();
+
+    const response: WebResponse<UserDto[]> = {
+      message: 'success showing all users',
+      data: users,
     };
 
     return response;

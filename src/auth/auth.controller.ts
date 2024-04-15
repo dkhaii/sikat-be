@@ -8,11 +8,12 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { AccessTokenResponse, LoginRequest } from '../dto/user.dto';
 import { WebResponse } from '../dto/web.dto';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwt.guard';
 import { Request } from 'express';
+import { LoginDto } from './dto/login.dto';
+import { AccessTokenDto } from './dto/access-token.dto';
 
 @Controller('/api')
 export class AuthController {
@@ -20,12 +21,10 @@ export class AuthController {
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  async login(
-    @Body() request: LoginRequest,
-  ): Promise<WebResponse<AccessTokenResponse>> {
-    const usrAccessToken = await this.authService.login(request);
+  async login(@Body() dto: LoginDto): Promise<WebResponse<AccessTokenDto>> {
+    const usrAccessToken = await this.authService.login(dto);
 
-    const response: WebResponse<AccessTokenResponse> = {
+    const response: WebResponse<AccessTokenDto> = {
       message: 'Login Success',
       data: usrAccessToken,
     };

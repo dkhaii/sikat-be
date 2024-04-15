@@ -1,16 +1,14 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { ValidationService } from '../common/validation.service';
-import {
-  AccessTokenResponse,
-  LoginRequest,
-  UserResponse,
-} from '../dto/user.dto';
 import { UserValidation } from '../user/user.validation';
 import { Logger } from 'winston';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
+import { LoginDto } from './dto/login.dto';
+import { AccessTokenDto } from './dto/access-token.dto';
+import { UserDto } from 'src/user/dto/user.dto';
 
 @Injectable()
 export class AuthService {
@@ -21,19 +19,19 @@ export class AuthService {
     private userService: UserService,
   ) {}
 
-  async login(request: LoginRequest): Promise<AccessTokenResponse> {
-    this.logger.debug(`AuthService.validateUser ${JSON.stringify(request)}`);
+  async login(dto: LoginDto): Promise<AccessTokenDto> {
+    this.logger.debug(`AuthService.validateUser ${JSON.stringify(dto)}`);
 
-    const loginRequest: LoginRequest = this.validationService.validate(
+    const loginRequest: LoginDto = this.validationService.validate(
       UserValidation.LOGIN,
-      request,
+      dto,
     );
 
-    const user = await this.userService.findByBagdeNum(request.id);
+    const user = await this.userService.findByBagdeNum(dto.id);
 
     await bcrypt.compare(loginRequest.password, user.password);
 
-    const payload: UserResponse = {
+    const payload: UserDto = {
       id: user.id,
       name: user.name,
       role: user.role,
@@ -41,10 +39,10 @@ export class AuthService {
 
     const accessToken = await this.jwtService.sign(payload);
 
-    const dto: AccessTokenResponse = {
+    const accessTokenDto: AccessTokenDto = {
       token: accessToken,
     };
 
-    return dto;
+    return accessTokenDto;
   }
 }

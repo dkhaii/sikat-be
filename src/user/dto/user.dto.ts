@@ -1,6 +1,6 @@
-export class UserModel {
+export class UserDto {
   id: string;
-  password: string;
+  password?: string;
   name: string;
   role: number;
   token?: string;
