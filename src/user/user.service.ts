@@ -42,7 +42,7 @@ export class UserService {
     const userDto: UserDto = {
       id: user.id,
       name: user.name,
-      role: user.role,
+      roleID: user.roleID,
     };
 
     return userDto;
@@ -74,7 +74,7 @@ export class UserService {
       id: user.id,
       password: user.password,
       name: user.name,
-      role: user.role,
+      roleID: user.roleID,
     };
 
     return userDto;

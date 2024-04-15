@@ -2,6 +2,6 @@ export class UserDto {
   id: string;
   password?: string;
   name: string;
-  role: number;
+  roleID: number;
   token?: string;
 }

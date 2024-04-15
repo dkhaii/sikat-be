@@ -35,7 +35,7 @@ describe('User Controller - add new user', () => {
         id: '',
         password: '',
         name: '',
-        role: null,
+        roleID: null,
       };
 
       const response = await request(app.getHttpServer())
@@ -53,7 +53,7 @@ describe('User Controller - add new user', () => {
         id: 'zs8565',
         password: 'zs8565',
         name: 'Mordekhai Gerin',
-        role: 1,
+        roleID: 1,
       };
 
       const response = await request(app.getHttpServer())
@@ -74,7 +74,7 @@ describe('User Controller - add new user', () => {
         id: 'zs8565',
         password: 'zs8565',
         name: 'Mordekhai Gerin',
-        role: 1,
+        roleID: 1,
       };
 
       const response = await request(app.getHttpServer())

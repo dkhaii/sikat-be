@@ -12,12 +12,21 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
-model User {
+
+model Roles {
+  id Int @id @db.Integer()
+  roleName String @map("role_name") @db.VarChar(100)
+  users Users[]
+
+  @@map("roles")
+}
+
+model Users {
   id String @id @db.VarChar(100)
   password String @db.VarChar(100)
   name String @db.VarChar(100)
-  role Int @db.Integer()
-  token String? @db.VarChar(100)
+  role Roles @relation(fields: [roleID], references: [id])
+  roleID Int @map("role_id")
 
   @@map("users")
 }

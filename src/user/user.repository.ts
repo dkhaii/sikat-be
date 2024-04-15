@@ -8,7 +8,7 @@ export class UserRepository {
 
   async insert(usr: User): Promise<User> {
     // insert to database
-    const user = await this.prismaService.user.create({
+    const user = await this.prismaService.users.create({
       data: usr,
     });
 
@@ -16,7 +16,7 @@ export class UserRepository {
   }
 
   async findByBadgeNum(usrBadgeNum: string): Promise<User> {
-    const user = await this.prismaService.user.findUnique({
+    const user = await this.prismaService.users.findUnique({
       where: {
         id: usrBadgeNum,
       },
@@ -26,26 +26,13 @@ export class UserRepository {
   }
 
   async findAll(): Promise<User[]> {
-    const users = await this.prismaService.user.findMany();
+    const users = await this.prismaService.users.findMany();
 
     return users;
   }
 
-  async updateToken(usr: User, token: string): Promise<string> {
-    const user = await this.prismaService.user.update({
-      where: {
-        id: usr.id,
-      },
-      data: {
-        token: token,
-      },
-    });
-
-    return user.token;
-  }
-
   async delete(usrBadgeNum: string): Promise<void> {
-    await this.prismaService.user.delete({
+    await this.prismaService.users.delete({
       where: {
         id: usrBadgeNum,
       },
