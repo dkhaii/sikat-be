@@ -6,7 +6,6 @@ import {
   HttpStatus,
   Post,
   Req,
-  UseGuards,
 } from '@nestjs/common';
 import { WebResponse } from '../dto/web.dto';
 import { AuthService } from './auth.service';
@@ -14,7 +13,6 @@ import { Request } from 'express';
 import { LoginDto } from './dto/login.dto';
 import { AccessTokenDto } from './dto/access-token.dto';
 import { Public } from '../common/public-routes.decorator';
-import { JwtAuthGuard } from './jwt/jwt.guard';
 
 @Controller('/api')
 export class AuthController {
@@ -36,7 +34,6 @@ export class AuthController {
     return response;
   }
 
-  @UseGuards(JwtAuthGuard)
   @Get('profile')
   @HttpCode(HttpStatus.OK)
   async getProfile(@Req() request: Request): Promise<WebResponse<any>> {

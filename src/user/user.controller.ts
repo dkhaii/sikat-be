@@ -7,23 +7,25 @@ import {
   HttpStatus,
   Param,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { WebResponse } from '../dto/web.dto';
 import { AddNewUserDto } from './dto/add-new-user.dto';
 import { UserDto } from './dto/user.dto';
-// import { Roles } from '../common/role/role.decorator';
-// import { Role } from '../common/role/role.enum';
+import { Roles } from '../common/role/role.decorator';
+import { Role } from '../common/role/role.enum';
+import { RolesGuard } from '../common/role/role.guard';
 
 @Controller('/api/auth/users')
 export class UserController {
   // dependency injection
   constructor(private userService: UserService) {}
 
-  // @Roles(Role.SUPERINTENDENT)
   @Post()
+  @UseGuards(RolesGuard)
+  @Roles(Role.SUPERINTENDENT)
   @HttpCode(HttpStatus.OK)
-  // @Roles(UserRole.SUPERINTENDENT)
   async addNew(@Body() dto: AddNewUserDto): Promise<WebResponse<UserDto>> {
     // creating new user
     const newUser = await this.userService.addNew(dto);
@@ -38,6 +40,8 @@ export class UserController {
   }
 
   @Delete('/:userID')
+  @UseGuards(RolesGuard)
+  @Roles(Role.SUPERINTENDENT)
   @HttpCode(HttpStatus.OK)
   async delete(@Param('userID') userID: string): Promise<WebResponse<string>> {
     // deleting user
@@ -52,6 +56,8 @@ export class UserController {
   }
 
   @Get()
+  @UseGuards(RolesGuard)
+  @Roles(Role.SUPERINTENDENT)
   @HttpCode(HttpStatus.OK)
   async showAll(): Promise<WebResponse<UserDto[]>> {
     // showing all user

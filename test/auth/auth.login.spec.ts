@@ -28,7 +28,7 @@ describe('Auth Controller - login', () => {
   describe('POST /api/login', () => {
     beforeEach(async () => {
       await testService.deleteUser();
-      await testService.createUser();
+      await testService.createSuptUser();
     });
 
     it('should be rejected if no authenticated user', async () => {

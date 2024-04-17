@@ -28,10 +28,14 @@ describe('Auth Controller - login', () => {
   describe('POST /api/login', () => {
     beforeEach(async () => {
       await testService.deleteUser();
-      await testService.createUser();
+      await testService.createSuptUser();
     });
 
     it('should be rejected if no authenticated user', async () => {
+      logger.info(
+        '========== should be rejected if no authenticated user ==========',
+      );
+
       const loginData: LoginDto = {
         id: 'zs8565',
         password: 'zs8565',
@@ -51,6 +55,10 @@ describe('Auth Controller - login', () => {
     });
 
     it('should be able to get authenticated user profile', async () => {
+      logger.info(
+        '========== should be able to get authenticated user profile ==========',
+      );
+
       const loginData: LoginDto = {
         id: 'zs8565',
         password: 'zs8565',

@@ -35,7 +35,7 @@ describe('User Controller - delete user', () => {
         '========== should be fail deleting user if no authenticated user ==========',
       );
 
-      await testService.createUser();
+      await testService.createSuptUser();
 
       const loginData: LoginDto = {
         id: '111111',
@@ -62,7 +62,7 @@ describe('User Controller - delete user', () => {
         '========== should be fail deleting user if user doesnt exist ==========',
       );
 
-      await testService.createUser();
+      await testService.createSuptUser();
 
       const loginData: LoginDto = {
         id: '111111',
@@ -87,7 +87,7 @@ describe('User Controller - delete user', () => {
     it('should be able to delete user', async () => {
       logger.info('========== should be able to delete user  ==========');
 
-      await testService.createUser();
+      await testService.createSuptUser();
 
       const loginData: LoginDto = {
         id: '111111',

@@ -52,6 +52,37 @@ describe('User Controller - add new user', () => {
       expect(response.body.errors).toBeDefined();
     });
 
+    it('should be rejected if authenticated user is supervisor', async () => {
+      logger.info(
+        '========== should be rejected if authenticated user is supervisor ==========',
+      );
+
+      await testService.createSupvUser();
+
+      const addNewUserData: AddNewUserDto = {
+        id: 'zs8565',
+        password: 'zs8565',
+        name: 'Mordekhai Gerin',
+        roleID: 1,
+      };
+
+      const loginData: LoginDto = {
+        id: 'zs8566',
+        password: 'zs8566',
+      };
+      const loginResponse = await testService.loginUser(loginData);
+      expect(loginResponse.token).toBeDefined();
+
+      const addNewUserResponse = await request(app.getHttpServer())
+        .post('/api/auth/users')
+        .set('Authorization', `Bearer ${loginResponse.token}`)
+        .send(addNewUserData);
+      logger.info(addNewUserResponse.body);
+
+      expect(addNewUserResponse.status).toBe(HttpStatus.FORBIDDEN);
+      expect(addNewUserResponse.body.errors).toBeDefined();
+    });
+
     it('should be rejected if request is invalid', async () => {
       logger.info(
         '========== should be rejected if request is invalid ==========',
@@ -114,7 +145,7 @@ describe('User Controller - add new user', () => {
         '========== should be fail inserting new user if user exist ==========',
       );
 
-      await testService.createUser();
+      await testService.createSuptUser();
 
       const addNewUserData: AddNewUserDto = {
         id: 'zs8565',
