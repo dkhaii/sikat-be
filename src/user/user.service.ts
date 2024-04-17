@@ -10,6 +10,7 @@ import { AddNewUserDto } from './dto/add-new-user.dto';
 
 @Injectable()
 export class UserService {
+  // dependency injection
   constructor(
     @Inject(WINSTON_MODULE_PROVIDER) private logger: Logger,
     private validationService: ValidationService,
@@ -35,10 +36,11 @@ export class UserService {
     }
 
     // hashing password
-    addNewUserDto.password = await bcrypt.hash(addNewUserDto.password, 10);
-    // add new user
+    addNewUserDto.password = await bcrypt.hashSync(addNewUserDto.password, 10);
+    // adding new user
     const user = await this.userRepository.insert(addNewUserDto);
 
+    // DTO
     const userDto: UserDto = {
       id: user.id,
       name: user.name,
@@ -49,27 +51,34 @@ export class UserService {
   }
 
   async delete(usrBadgeNum: string): Promise<void> {
+    // show logging when running the function
     this.logger.debug(`UserService.delete ${JSON.stringify(usrBadgeNum)}`);
 
     // check user existance
     const existingUser = await this.userRepository.findByBadgeNum(usrBadgeNum);
     if (!existingUser) {
+      // throw an error
       throw new HttpException('No user exist', HttpStatus.NOT_FOUND);
     }
 
+    // deleting user
     await this.userRepository.delete(usrBadgeNum);
   }
 
   async findByBagdeNum(badgeNumber: string): Promise<UserDto> {
+    // show logging when running the function
     this.logger.debug(
       `UserService.findByBadgeNum ${JSON.stringify(badgeNumber)}`,
     );
 
+    // finding user by badge number
     const user = await this.userRepository.findByBadgeNum(badgeNumber);
     if (!user) {
+      // throw an error
       throw new HttpException('Badge Number Invalid', HttpStatus.BAD_REQUEST);
     }
 
+    // DTO
     const userDto: UserDto = {
       id: user.id,
       password: user.password,
@@ -81,8 +90,10 @@ export class UserService {
   }
 
   async showAll(): Promise<UserDto[]> {
+    // show logging when running the function
     this.logger.debug('UserService.showAll');
 
+    // showing all user
     const users = await this.userRepository.findAll();
 
     return users;

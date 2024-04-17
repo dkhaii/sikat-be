@@ -1,14 +1,25 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../src/common/prisma.service';
-import { UserModel } from 'src/model/user.model';
 import * as bcrypt from 'bcrypt';
+import { User } from '../src/user/user.entity';
+import { LoginDto } from '../src/auth/dto/login.dto';
+import { AuthService } from '../src/auth/auth.service';
 
 @Injectable()
 export class TestService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(
+    private prismaService: PrismaService,
+    private authServie: AuthService,
+  ) {}
+
+  async loginUser(loginDto: LoginDto) {
+    const loginResponse = await this.authServie.login(loginDto);
+
+    return loginResponse;
+  }
 
   async deleteUser() {
-    await this.prismaService.user.deleteMany({
+    await this.prismaService.users.deleteMany({
       where: {
         id: 'zs8565',
       },
@@ -16,18 +27,18 @@ export class TestService {
   }
 
   async createUser() {
-    await this.prismaService.user.create({
+    await this.prismaService.users.create({
       data: {
         id: 'zs8565',
         password: await bcrypt.hash('zs8565', 10),
         name: 'Mordekhai Gerin',
-        role: 1,
+        roleID: 1,
       },
     });
   }
 
-  async findUser(usrBadgeNum: string): Promise<UserModel> {
-    const user: UserModel = await this.prismaService.user.findUnique({
+  async findUser(usrBadgeNum: string): Promise<User> {
+    const user: User = await this.prismaService.users.findUnique({
       where: {
         id: usrBadgeNum,
       },

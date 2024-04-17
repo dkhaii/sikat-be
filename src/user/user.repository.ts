@@ -7,7 +7,7 @@ export class UserRepository {
   constructor(private prismaService: PrismaService) {}
 
   async insert(usr: User): Promise<User> {
-    // insert to database
+    // inserting new user to database
     const user = await this.prismaService.users.create({
       data: usr,
     });
@@ -16,6 +16,7 @@ export class UserRepository {
   }
 
   async findByBadgeNum(usrBadgeNum: string): Promise<User> {
+    // finding user by badge number
     const user = await this.prismaService.users.findUnique({
       where: {
         id: usrBadgeNum,
@@ -26,12 +27,14 @@ export class UserRepository {
   }
 
   async findAll(): Promise<User[]> {
+    // showing all user
     const users = await this.prismaService.users.findMany();
 
     return users;
   }
 
   async delete(usrBadgeNum: string): Promise<void> {
+    // deleting user
     await this.prismaService.users.delete({
       where: {
         id: usrBadgeNum,

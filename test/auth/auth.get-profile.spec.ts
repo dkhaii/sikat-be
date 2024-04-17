@@ -32,20 +32,17 @@ describe('Auth Controller - login', () => {
     });
 
     it('should be rejected if no authenticated user', async () => {
-      const data: LoginDto = {
+      const loginData: LoginDto = {
         id: 'zs8565',
         password: 'zs8565',
       };
 
-      const loginResponse = await request(app.getHttpServer())
-        .post('/api/login')
-        .send(data);
+      const loginResopnse = await testService.loginUser(loginData);
+      expect(loginResopnse.token).toBeDefined();
 
-      logger.info(loginResponse.body);
-
-      const userProfileResponse = await request(app.getHttpServer()).get(
-        '/api/profile',
-      );
+      const userProfileResponse = await request(app.getHttpServer())
+        .get('/api/profile')
+        .set('Authorization', '');
 
       logger.info(userProfileResponse.body);
 
@@ -54,20 +51,17 @@ describe('Auth Controller - login', () => {
     });
 
     it('should be able to get authenticated user profile', async () => {
-      const data: LoginDto = {
+      const loginData: LoginDto = {
         id: 'zs8565',
         password: 'zs8565',
       };
 
-      const loginResponse = await request(app.getHttpServer())
-        .post('/api/login')
-        .send(data);
-
-      logger.info(loginResponse.body);
+      const loginResponse = await testService.loginUser(loginData);
+      expect(loginResponse.token).toBeDefined();
 
       const userProfileResponse = await request(app.getHttpServer())
         .get('/api/profile')
-        .set('Authorization', `Bearer ${loginResponse.body.data.token}`);
+        .set('Authorization', `Bearer ${loginResponse.token}`);
 
       logger.info(userProfileResponse.body);
 

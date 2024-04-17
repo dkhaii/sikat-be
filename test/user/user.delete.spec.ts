@@ -6,6 +6,7 @@ import { AppModule } from '../../src/app.module';
 import { TestModule } from '../test.module';
 import { TestService } from '../test.service';
 import { Logger } from 'winston';
+import { LoginDto } from 'src/auth/dto/login.dto';
 
 describe('User Controller - delete user', () => {
   let app: INestApplication;
@@ -29,35 +30,84 @@ describe('User Controller - delete user', () => {
       await testService.deleteUser();
     });
 
-    it('should be fail deleting user if user doesnt exist', async () => {
+    it('should be fail deleting user if no authenticated user', async () => {
+      logger.info(
+        '========== should be fail deleting user if no authenticated user ==========',
+      );
+
       await testService.createUser();
+
+      const loginData: LoginDto = {
+        id: '111111',
+        password: 'admin123',
+      };
+
+      const loginResponse = await testService.loginUser(loginData);
+      expect(loginResponse.token).toBeDefined();
 
       const usrBadgeNumber: string = 'zs8555';
 
-      const response = await request(app.getHttpServer()).delete(
-        `/api/auth/users/${usrBadgeNumber}`,
+      const deleteUserResponse = await request(app.getHttpServer())
+        .delete(`/api/auth/users/${usrBadgeNumber}`)
+        .set('Authorization', '');
+
+      logger.info(deleteUserResponse.body);
+
+      expect(deleteUserResponse.status).toBe(HttpStatus.UNAUTHORIZED);
+      expect(deleteUserResponse.body.errors).toBeDefined();
+    });
+
+    it('should be fail deleting user if user doesnt exist', async () => {
+      logger.info(
+        '========== should be fail deleting user if user doesnt exist ==========',
       );
 
-      logger.info(response.body);
+      await testService.createUser();
 
-      expect(response.status).toBe(HttpStatus.NOT_FOUND);
-      expect(response.body.errors).toBeDefined();
+      const loginData: LoginDto = {
+        id: '111111',
+        password: 'admin123',
+      };
+
+      const loginResponse = await testService.loginUser(loginData);
+      expect(loginResponse.token).toBeDefined();
+
+      const usrBadgeNumber: string = 'zs8555';
+
+      const deleteUserResponse = await request(app.getHttpServer())
+        .delete(`/api/auth/users/${usrBadgeNumber}`)
+        .set('Authorization', `Bearer ${loginResponse.token}`);
+
+      logger.info(deleteUserResponse.body);
+
+      expect(deleteUserResponse.status).toBe(HttpStatus.NOT_FOUND);
+      expect(deleteUserResponse.body.errors).toBeDefined();
     });
 
     it('should be able to delete user', async () => {
+      logger.info('========== should be able to delete user  ==========');
+
       await testService.createUser();
+
+      const loginData: LoginDto = {
+        id: '111111',
+        password: 'admin123',
+      };
+
+      const loginResponse = await testService.loginUser(loginData);
+      expect(loginResponse.token).toBeDefined();
 
       const usrBadgeNumber: string = 'zs8565';
 
-      const response = await request(app.getHttpServer()).delete(
-        `/api/auth/users/${usrBadgeNumber}`,
-      );
+      const deleteUserResponse = await request(app.getHttpServer())
+        .delete(`/api/auth/users/${usrBadgeNumber}`)
+        .set('Authorization', `Bearer ${loginResponse.token}`);
 
-      logger.info(response.body);
+      logger.info(deleteUserResponse.body);
 
       const isUser = await testService.findUser(usrBadgeNumber);
       if (!isUser) {
-        expect(response.status).toBe(HttpStatus.OK);
+        expect(deleteUserResponse.status).toBe(HttpStatus.OK);
       }
     });
   });

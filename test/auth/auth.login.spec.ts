@@ -31,6 +31,17 @@ describe('Auth Controller - login', () => {
       await testService.createUser();
     });
 
+    it('should be rejected if no authenticated user', async () => {
+      const userProfileResponse = await request(app.getHttpServer())
+        .get('/api/profile')
+        .set('Authorization', ' ');
+
+      logger.info(userProfileResponse.body);
+
+      expect(userProfileResponse.status).toBe(HttpStatus.UNAUTHORIZED);
+      expect(userProfileResponse.body.errors).toBeDefined();
+    });
+
     it('should be rejected if request invalid', async () => {
       const data: LoginDto = {
         id: '',
@@ -61,28 +72,6 @@ describe('Auth Controller - login', () => {
 
       expect(response.status).toBe(HttpStatus.OK);
       expect(response.body.data.token).toBeDefined();
-    });
-
-    it('should be rejected if no authenticated user', async () => {
-      const data: LoginDto = {
-        id: 'zs8565',
-        password: 'zs8565',
-      };
-
-      const loginResponse = await request(app.getHttpServer())
-        .post('/api/login')
-        .send(data);
-
-      logger.info(loginResponse.body);
-
-      const userProfileResponse = await request(app.getHttpServer()).get(
-        '/api/profile',
-      );
-
-      logger.info(userProfileResponse.body);
-
-      expect(userProfileResponse.status).toBe(HttpStatus.UNAUTHORIZED);
-      expect(userProfileResponse.body.errors).toBeDefined();
     });
   });
 });

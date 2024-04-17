@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { User } from 'src/user/user.entity';
+import * as bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
@@ -16,7 +17,7 @@ const roles = [
 
 const defaultAdmin: User = {
   id: '111111',
-  password: 'admin123',
+  password: bcrypt.hashSync('admin123', 10),
   name: 'default admin',
   roleID: 1,
 };
