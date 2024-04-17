@@ -10,6 +10,7 @@ import { JwtAuthGuard } from './jwt/jwt.guard';
 @Module({
   imports: [
     UserModule,
+    // jwt configuration
     JwtModule.register({
       secret: process.env.JWT_SECRET_KEY,
       signOptions: {
@@ -21,6 +22,7 @@ import { JwtAuthGuard } from './jwt/jwt.guard';
   providers: [
     AuthService,
     JwtStrategy,
+    // enable jwt guard globally
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,

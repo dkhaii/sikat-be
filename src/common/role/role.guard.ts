@@ -3,6 +3,9 @@ import { Reflector } from '@nestjs/core';
 import { Role } from './role.enum';
 import { ROLES_KEY } from './role.decorator';
 
+// RolesGuard class which will compare the roles assigned to the current user to the actual roles required by the current route being processed.
+// In order to access the route's role(s) (custom metadata),
+// use Reflector helper class, which is provided out of the box by the framework and exposed from the @nestjs/core package.
 @Injectable()
 export class RolesGuard implements CanActivate {
   constructor(private reflector: Reflector) {}

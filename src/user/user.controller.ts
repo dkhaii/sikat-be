@@ -22,11 +22,12 @@ export class UserController {
   // dependency injection
   constructor(private userService: UserService) {}
 
-  @Post()
-  @UseGuards(RolesGuard)
-  @Roles(Role.SUPERINTENDENT)
-  @HttpCode(HttpStatus.OK)
+  @Post() // http method
+  @UseGuards(RolesGuard) // use role guard
+  @Roles(Role.SUPERINTENDENT) // define required role
+  @HttpCode(HttpStatus.OK) // http status
   async addNew(@Body() dto: AddNewUserDto): Promise<WebResponse<UserDto>> {
+    // binding the request body payload to "dto"
     // creating new user
     const newUser = await this.userService.addNew(dto);
 
@@ -44,6 +45,7 @@ export class UserController {
   @Roles(Role.SUPERINTENDENT)
   @HttpCode(HttpStatus.OK)
   async delete(@Param('userID') userID: string): Promise<WebResponse<string>> {
+    // binding the request url parameter payload to "userID"
     // deleting user
     await this.userService.delete(userID);
 
