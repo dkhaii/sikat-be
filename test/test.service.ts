@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../src/common/prisma.service';
 import * as bcrypt from 'bcrypt';
-import { User } from '../src/user/user.entity';
+import { User } from '../src/user/entities/user.entity';
 import { LoginDto } from '../src/auth/dto/login.dto';
 import { AuthService } from '../src/auth/auth.service';
+import { Employee } from 'src/employee/entities/employee.entity';
 
 @Injectable()
 export class TestService {
@@ -68,5 +69,39 @@ export class TestService {
     });
 
     return user;
+  }
+
+  async createEmployee() {
+    await this.prismaService.employees.create({
+      data: {
+        id: 'zs8565',
+        name: 'Mordekhai Gerin',
+        profilePicture: 'Mordekhai',
+        dateOfBirth: new Date(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    });
+  }
+
+  async findOneEmployee(badgeNum: string): Promise<Employee> {
+    const employee: Employee = await this.prismaService.employees.findUnique({
+      where: {
+        id: badgeNum,
+      },
+    });
+
+    return employee;
+  }
+
+  async deleteEmployee() {
+    const employee = await this.findOneEmployee('zs8565');
+    if (employee) {
+      await this.prismaService.employees.delete({
+        where: {
+          id: 'zs8565',
+        },
+      });
+    }
   }
 }

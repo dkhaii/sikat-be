@@ -1,0 +1,15 @@
+export enum Position {
+  SUPERINTENDENT = 1,
+  ENGINEER = 2,
+  SPECIALIST = 3,
+  SUPERVISOR = 4,
+  TRINER = 5,
+  GDP = 6,
+  DISPATCHER = 7,
+  ASSISTANT = 8,
+  OPERATOR_MAGANG = 9,
+  DISPATCH = 10,
+  MINING = 11,
+  SENIOR = 12,
+  JUNIOR = 13,
+}
