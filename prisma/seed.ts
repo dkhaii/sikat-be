@@ -70,51 +70,39 @@ const positions = [
   },
   {
     id: 2,
-    name: 'engineer',
+    name: 'senior dispatch engineer',
   },
   {
     id: 3,
-    name: 'specialist',
+    name: 'senior mining engineer',
   },
   {
     id: 4,
-    name: 'supervisor',
+    name: 'specialist dispatch',
   },
   {
     id: 5,
-    name: 'triner',
+    name: 'supervisor',
   },
   {
     id: 6,
-    name: 'gdp',
+    name: 'triner',
   },
   {
     id: 7,
-    name: 'dispatcher',
+    name: 'gdp',
   },
   {
     id: 8,
-    name: 'assistant',
+    name: 'dispatcher',
   },
   {
     id: 9,
-    name: 'operator magang',
+    name: 'assistant dispatcher',
   },
   {
     id: 10,
-    name: 'dispatch',
-  },
-  {
-    id: 11,
-    name: 'mining',
-  },
-  {
-    id: 12,
-    name: 'senior',
-  },
-  {
-    id: 13,
-    name: 'junior',
+    name: 'operator magang',
   },
 ];
 
@@ -199,6 +187,16 @@ seedUsers()
     process.exit(0);
   });
 
+seedPositions()
+  .then(async () => {
+    await prisma.$disconnect;
+  })
+  .catch(async (error) => {
+    console.log(error);
+    await prisma.$disconnect;
+    process.exit(1);
+  });
+
 seedBases()
   .then(async () => {
     await prisma.$disconnect;
@@ -220,16 +218,6 @@ seedCrews()
   });
 
 seedPits()
-  .then(async () => {
-    await prisma.$disconnect;
-  })
-  .catch(async (error) => {
-    console.log(error);
-    await prisma.$disconnect;
-    process.exit(0);
-  });
-
-seedPositions()
   .then(async () => {
     await prisma.$disconnect;
   })

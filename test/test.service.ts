@@ -4,7 +4,11 @@ import * as bcrypt from 'bcrypt';
 import { User } from '../src/user/entities/user.entity';
 import { LoginDto } from '../src/auth/dto/login.dto';
 import { AuthService } from '../src/auth/auth.service';
-import { Employee } from 'src/employee/entities/employee.entity';
+import { Employee } from '../src/employee/entities/employee.entity';
+import { Positions } from '../src/employee/enums/position.enum';
+import { Crews } from '../src/employee/enums/crew.enum';
+import { Pits } from '../src/employee/enums/pit.enum';
+import { Bases } from '../src/employee/enums/base.enum';
 
 @Injectable()
 export class TestService {
@@ -78,6 +82,10 @@ export class TestService {
         name: 'Mordekhai Gerin',
         profilePicture: 'Mordekhai',
         dateOfBirth: new Date(),
+        positionID: Positions.GDP,
+        crewID: Crews.ALPHA,
+        pitID: Pits.BINTANG,
+        baseID: Bases.M2,
         createdAt: new Date(),
         updatedAt: new Date(),
       },

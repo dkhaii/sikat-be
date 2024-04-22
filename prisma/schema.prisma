@@ -14,107 +14,70 @@ datasource db {
 }
 
 model Roles {
-  id Int @id @db.Integer()
-  roleName String @map("role_name") @db.VarChar(100)
+  id Int @id 
+  roleName String @map("role_name") @db.VarChar() 
   users Users[]
 
   @@map("roles")
 }
 
 model Users {
-  id String @id @db.VarChar(100)
-  password String @db.VarChar(100)
-  name String @db.VarChar(100)
+  id String @id 
+  password String @db.VarChar()
+  name String @db.VarChar()
   role Roles @relation(fields: [roleID], references: [id])
-  roleID Int @map("role_id") @db.Integer
+  roleID Int @map("role_id") 
   
   @@map("users")
 }
 
 model Employees {
-  id String @id @db.VarChar(100)
-  name String @db.VarChar(100)
-  profilePicture String? @map("profile_picture") @db.VarChar(255)
+  id String @id 
+  name String @db.VarChar()
+  profilePicture String? @map("profile_picture") @db.VarChar() 
   dateOfBirth DateTime @map("date_of_birth") @db.Date
+  position Positions @relation(fields: [positionID], references: [id])
+  positionID Int @map("position_id") 
+  crew Crews? @relation(fields: [crewID], references: [id])
+  crewID Int? @map("crew_id")
+  pit Pits? @relation(fields: [pitID], references: [id])
+  pitID Int? @map("pit_id")
+  base Bases? @relation(fields: [baseID], references: [id])
+  baseID Int? @map("base_id")
   createdAt DateTime @map("created_at") @db.Timestamp()
   updatedAt DateTime @map("updated_at") @db.Timestamp()
-  // dateOfHire DateTime? @db.Date
-  // position Positions @relation(fields: [positionID], references: [id])
-  // positionID Int @map("position_id") @db.Integer
-  // crew Crews? @relation(fields: [crewID], references: [id])
-  // crewID Int? @map("crew_id") @db.Integer  
-  // base Bases? @relation(fields: [baseID], references: [id])
-  // baseID Int? @map("base_id") @db.Integer
-  // pit Pits? @relation(fields: [pitID], references: [id])
-  // pitID Int? @map("pit_id") @db.Integer
-  details EmployeeDetails?
-  positions EmployeePositions[]
 
   @@map("employees")
 }
 
 model Pits {
-  id Int @id @db.Integer
-  name String @db.VarChar(100)
-  employees EmployeeDetails[]
+  id Int @id
+  name String @db.VarChar()
+  employees Employees[]
 
   @@map("pits")
 }
 
 model Bases {
-  id Int @id @db.Integer
-  name String @db.VarChar(100)
-  employees EmployeeDetails[]
+  id Int @id 
+  name String @db.VarChar()
+  employees Employees[]
 
   @@map("bases")
 }
 
 model Crews {
-  id Int @id @db.Integer
-  name String @db.VarChar(100)
-  employees EmployeeDetails[]
+  id Int @id 
+  name String @db.VarChar()
+  employees Employees[]
 
   @@map("crews")
 }
 
 model Positions {
-  id Int @id @db.Integer
-  name String @db.VarChar(100)
-  
-  positionDetails EmployeePositions[]
+  id Int @id 
+  name String @db.VarChar()
+  employeed Employees[]
 
   @@map("positions")
-}
-
-model EmployeeDetails {
-  id Int @id @default(autoincrement())
-  employee Employees @relation(fields: [badgeNumber], references: [id])
-  badgeNumber String @map("badge_number") @unique @db.VarChar(100)
-  dateOfHire DateTime? @map("date_of_hire") @db.Date
-  employeePositions EmployeePositions? @relation(fields: [positions], references: [id])
-  positions Int? @map("emp_positions") @db.Integer
-  crew Crews? @relation(fields: [crewID], references: [id])
-  crewID Int? @map("crew_id") @db.Integer  
-  base Bases? @relation(fields: [baseID], references: [id])
-  baseID Int? @map("base_id") @db.Integer
-  pit Pits? @relation(fields: [pitID], references: [id])
-  pitID Int? @map("pit_id") @db.Integer
-  createdAt DateTime @map("created_at") @db.Timestamp()
-  updatedAt DateTime @map("updated_at") @db.Timestamp()
-
-  @@map("emp_details")
-}
-
-model EmployeePositions {
-  id Int @id @default(autoincrement())
-  employee Employees @relation(fields: [badgeNumber], references: [id])
-  badgeNumber String @map("badge_number") @db.VarChar(100)
-  position Positions @relation(fields: [positionID], references: [id])
-  positionID Int @map("position_id") @db.Integer
-  createdAt DateTime @map("created_at") @db.Timestamp()
-  updatedAt DateTime @map("updated_at") @db.Timestamp()
-
-  employeeDetail EmployeeDetails[]
-
-  @@map("emp_positions")
 }

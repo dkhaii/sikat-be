@@ -11,14 +11,14 @@ import {
   // Delete,
 } from '@nestjs/common';
 import { EmployeeService } from './employee.service';
-import { CreateEmployeeDto } from './dto/create-employee.dto';
+import { AddNewEmployeeDto } from './dto/add-new-employee.dto';
+import { WebResponse } from '../dto/web.dto';
 import { RolesGuard } from '../common/role/role.guard';
 import { Roles } from '../common/role/role.decorator';
 import { Role } from '../common/role/role.enum';
-import { WebResponse } from '../dto/web.dto';
 // import { UpdateEmployeeDto } from './dto/update-employee.dto';
 
-@Controller('/api/auth/employee')
+@Controller('/api/auth/employees')
 export class EmployeeController {
   constructor(private readonly employeeService: EmployeeService) {}
 
@@ -26,14 +26,14 @@ export class EmployeeController {
   @UseGuards(RolesGuard)
   @Roles(Role.SUPERINTENDENT)
   @HttpCode(HttpStatus.OK)
-  async create(
-    @Body() dto: CreateEmployeeDto,
-  ): Promise<WebResponse<CreateEmployeeDto>> {
-    const newEmployee = await this.employeeService.create(dto);
+  async addNew(
+    @Body() dto: AddNewEmployeeDto,
+  ): Promise<WebResponse<AddNewEmployeeDto>> {
+    const employee = await this.employeeService.addNew(dto);
 
-    const response: WebResponse<CreateEmployeeDto> = {
-      message: 'Success create new employee',
-      data: newEmployee,
+    const response: WebResponse<AddNewEmployeeDto> = {
+      message: 'success add new employee',
+      data: employee,
     };
 
     return response;

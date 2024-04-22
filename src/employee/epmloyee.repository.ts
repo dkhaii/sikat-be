@@ -7,7 +7,6 @@ export class EmployeeRepository {
   constructor(private prismaService: PrismaService) {}
 
   async insert(emp: Employee): Promise<Employee> {
-    //inserting new employee
     const employee = await this.prismaService.employees.create({
       data: emp,
     });
@@ -15,16 +14,10 @@ export class EmployeeRepository {
     return employee;
   }
 
-  async findAll(): Promise<Employee[]> {
-    const employees = await this.prismaService.employees.findMany();
-
-    return employees;
-  }
-
-  async findByBadgeNumber(badgeNumber: string): Promise<Employee> {
-    const employee = await this.prismaService.employees.findFirst({
+  async findOneByID(empID: string): Promise<Employee> {
+    const employee = await this.prismaService.employees.findUnique({
       where: {
-        id: badgeNumber,
+        id: empID,
       },
     });
 
