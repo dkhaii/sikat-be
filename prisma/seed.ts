@@ -1,6 +1,13 @@
 import { PrismaClient } from '@prisma/client';
 import { User } from 'src/user/entities/user.entity';
 import * as bcrypt from 'bcrypt';
+import { faker } from '@faker-js/faker';
+import { Employee } from 'src/employee/entities/employee.entity';
+import { v4 as uuid } from 'uuid';
+import { Positions } from '../src/employee/enums/position.enum';
+import { Crews } from '../src/employee/enums/crew.enum';
+import { Pits } from '../src/employee/enums/pit.enum';
+import { Bases } from '../src/employee/enums/base.enum';
 
 const prisma = new PrismaClient();
 
@@ -167,6 +174,41 @@ async function seedPositions() {
   }
 }
 
+async function seedEmployees() {
+  delay(5000);
+  const amountOfUsers = 75;
+
+  const employees: Employee[] = [];
+
+  for (let i = 0; i < amountOfUsers; i++) {
+    const employee: Employee = {
+      id: uuid(),
+      name: faker.person.fullName(),
+      profilePicture: uuid(),
+      dateOfBirth: faker.date.birthdate(),
+      positionID: faker.helpers.enumValue(Positions),
+      crewID: faker.helpers.enumValue(Crews),
+      pitID: faker.helpers.enumValue(Pits),
+      baseID: faker.helpers.enumValue(Bases),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    employees.push(employee);
+  }
+  console.log(employees);
+
+  for (const employee of employees) {
+    await prisma.employees.create({
+      data: employee,
+    });
+  }
+}
+
+function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 seedRoles()
   .then(async () => {
     await prisma.$disconnect;
@@ -218,6 +260,16 @@ seedCrews()
   });
 
 seedPits()
+  .then(async () => {
+    await prisma.$disconnect;
+  })
+  .catch(async (error) => {
+    console.log(error);
+    await prisma.$disconnect;
+    process.exit(0);
+  });
+
+seedEmployees()
   .then(async () => {
     await prisma.$disconnect;
   })

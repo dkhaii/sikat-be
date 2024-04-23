@@ -13,7 +13,7 @@ import { Crews } from '../../src/employee/enums/crew.enum';
 import { Pits } from '../../src/employee/enums/pit.enum';
 import { Bases } from '../../src/employee/enums/base.enum';
 
-describe('User Controller - add new user', () => {
+describe('Employee Controller - add new employee', () => {
   let app: INestApplication;
   let logger: Logger;
   let testService: TestService;
@@ -30,7 +30,7 @@ describe('User Controller - add new user', () => {
     testService = app.get(TestService);
   });
 
-  describe('POST /api/auth/users', () => {
+  describe('POST /api/auth/employees', () => {
     beforeEach(async () => {
       await testService.deleteUser();
       await testService.deleteEmployee();

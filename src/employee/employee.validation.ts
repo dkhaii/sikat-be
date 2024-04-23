@@ -12,4 +12,14 @@ export class EmployeeValidation {
     pitID: z.number().optional(),
     baseID: z.number().optional(),
   });
+
+  static readonly UPDATE: ZodType = z.object({
+    name: z.string().min(2).optional(),
+    profilePicture: z.string().optional(),
+    dateOfBirth: z.string().optional(),
+    positionID: z.number().optional(),
+    crewID: z.number().optional(),
+    pitID: z.number().optional(),
+    baseID: z.number().optional(),
+  });
 }
