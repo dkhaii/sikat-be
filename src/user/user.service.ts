@@ -28,7 +28,7 @@ export class UserService {
     );
 
     // check user existance
-    const existingUser = await this.userRepository.findByBadgeNum(
+    const existingUser = await this.userRepository.findOneByID(
       addNewUserDto.id,
     );
     if (existingUser) {
@@ -55,7 +55,7 @@ export class UserService {
     this.logger.debug(`UserService.delete ${JSON.stringify(usrBadgeNum)}`);
 
     // check user existance
-    const existingUser = await this.userRepository.findByBadgeNum(usrBadgeNum);
+    const existingUser = await this.userRepository.findOneByID(usrBadgeNum);
     if (!existingUser) {
       // throw an error
       throw new HttpException('No user exist', HttpStatus.NOT_FOUND);
@@ -72,7 +72,7 @@ export class UserService {
     );
 
     // finding user by badge number
-    const user = await this.userRepository.findByBadgeNum(badgeNumber);
+    const user = await this.userRepository.findOneByID(badgeNumber);
     if (!user) {
       // throw an error
       throw new HttpException('Badge Number Invalid', HttpStatus.BAD_REQUEST);

@@ -15,11 +15,11 @@ export class UserRepository {
     return user;
   }
 
-  async findByBadgeNum(usrBadgeNum: string): Promise<User> {
+  async findOneByID(usrID: string): Promise<User> {
     // finding user by badge number
     const user = await this.prismaService.users.findUnique({
       where: {
-        id: usrBadgeNum,
+        id: usrID,
       },
     });
 
