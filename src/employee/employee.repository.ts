@@ -201,6 +201,7 @@ export class EmployeeRepository {
       name: employee.name,
       profilePicture: employee.profilePicture,
       dateOfBirth: employee.dateOfBirth,
+      dateOfHire: employee.dateOfHire,
       position: employee.position.name,
       crew: employee.crew.name,
       pit: employee.pit.name,

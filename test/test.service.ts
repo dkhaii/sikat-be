@@ -82,6 +82,7 @@ export class TestService {
         name: 'Mordekhai Gerin',
         profilePicture: 'Mordekhai',
         dateOfBirth: new Date(),
+        dateOfHire: new Date(),
         positionID: Positions.GDP,
         crewID: Crews.ALPHA,
         pitID: Pits.BINTANG,

@@ -53,12 +53,11 @@ describe('Employee Controller - add new employee', () => {
         name: 'Mordekhai Gerin',
         profilePicture: 'Mordekhai',
         dateOfBirth: new Date(),
+        dateOfHire: new Date(),
         positionID: Positions.GDP,
         crewID: Crews.ALPHA,
         pitID: Pits.BINTANG,
         baseID: Bases.M2,
-        createdAt: new Date(),
-        updatedAt: new Date(),
       };
 
       const newEmployeeResponse = await request(app.getHttpServer())
@@ -90,12 +89,11 @@ describe('Employee Controller - add new employee', () => {
         name: 'Mordekhai Gerin',
         profilePicture: 'Mordekhai',
         dateOfBirth: new Date(),
+        dateOfHire: new Date(),
         positionID: Positions.GDP,
         crewID: Crews.ALPHA,
         pitID: Pits.BINTANG,
         baseID: Bases.M2,
-        createdAt: new Date(),
-        updatedAt: new Date(),
       };
 
       const newEmployeeResponse = await request(app.getHttpServer())
@@ -125,12 +123,11 @@ describe('Employee Controller - add new employee', () => {
         name: '',
         profilePicture: 'Mordekhai',
         dateOfBirth: new Date(),
+        dateOfHire: new Date(),
         positionID: null,
         crewID: Crews.ALPHA,
         pitID: Pits.BINTANG,
         baseID: Bases.M2,
-        createdAt: new Date(),
-        updatedAt: new Date(),
       };
 
       const newEmployeeResponse = await request(app.getHttpServer())
@@ -162,12 +159,11 @@ describe('Employee Controller - add new employee', () => {
         name: 'Mordekhai Gerin',
         profilePicture: 'Mordekhai',
         dateOfBirth: new Date(),
+        dateOfHire: new Date(),
         positionID: Positions.GDP,
         crewID: Crews.ALPHA,
         pitID: Pits.BINTANG,
         baseID: Bases.M2,
-        createdAt: new Date(),
-        updatedAt: new Date(),
       };
 
       const newEmployeeResponse = await request(app.getHttpServer())
@@ -195,12 +191,11 @@ describe('Employee Controller - add new employee', () => {
         name: 'Mordekhai Gerin',
         profilePicture: 'Mordekhai',
         dateOfBirth: new Date(),
+        dateOfHire: new Date(),
         positionID: Positions.GDP,
         crewID: Crews.ALPHA,
         pitID: Pits.BINTANG,
         baseID: Bases.M2,
-        createdAt: new Date(),
-        updatedAt: new Date(),
       };
 
       const newEmployeeResponse = await request(app.getHttpServer())

@@ -113,6 +113,21 @@ const positions = [
   },
 ];
 
+const leaveStatus = [
+  {
+    id: 1,
+    name: 'annual leave',
+  },
+  {
+    id: 2,
+    name: 'sick leave',
+  },
+  {
+    id: 3,
+    name: 'business trip',
+  },
+];
+
 async function seedRoles() {
   for (const role of roles) {
     await prisma.roles.create({
@@ -187,6 +202,7 @@ async function seedEmployees() {
       name: faker.person.fullName(),
       profilePicture: uuid(),
       dateOfBirth: faker.date.birthdate(),
+      dateOfHire: faker.date.past(),
       positionID: faker.helpers.arrayElement(positions).id,
       crewID: faker.helpers.arrayElement(crews).id,
       pitID: faker.helpers.arrayElement(pits).id,
@@ -202,6 +218,14 @@ async function seedEmployees() {
   for (const employee of employees) {
     await prisma.employees.create({
       data: employee,
+    });
+  }
+}
+
+async function seedLeaveStatus() {
+  for (const status of leaveStatus) {
+    await prisma.leaveStatus.create({
+      data: status,
     });
   }
 }
@@ -267,6 +291,16 @@ seedPits()
   });
 
 seedEmployees()
+  .then(async () => {
+    await prisma.$disconnect;
+  })
+  .catch(async (error) => {
+    console.log(error);
+    await prisma.$disconnect;
+    // process.exit(1);
+  });
+
+seedLeaveStatus()
   .then(async () => {
     await prisma.$disconnect;
   })

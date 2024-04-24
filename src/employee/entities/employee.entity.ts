@@ -3,6 +3,7 @@ export class Employee {
   name: string;
   profilePicture: string;
   dateOfBirth: Date;
+  dateOfHire: Date;
   positionID: number;
   crewID: number;
   pitID: number;

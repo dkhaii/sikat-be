@@ -31,12 +31,14 @@ describe('Employee Controller - find one by ID employee', () => {
       await testService.deleteEmployee();
     });
 
-    const empID = '302995de-7d28-4c21-86b1-95755ba0adf5';
+    const empID = 'zs8565';
 
     it('should be rejected if no authenticated user', async () => {
       logger.info(
         '========== should be rejected if no authenticated user ==========',
       );
+
+      await testService.createEmployee();
 
       const loginData: LoginDto = {
         id: '111111',
@@ -78,6 +80,8 @@ describe('Employee Controller - find one by ID employee', () => {
       logger.info(
         '========== should be able to find one by ID employee ==========',
       );
+
+      await testService.createEmployee();
 
       const loginData: LoginDto = {
         id: '111111',

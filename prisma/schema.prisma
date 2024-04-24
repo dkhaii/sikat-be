@@ -36,6 +36,7 @@ model Employees {
   name String @db.VarChar()
   profilePicture String? @map("profile_picture") @db.VarChar() 
   dateOfBirth DateTime @map("date_of_birth") @db.Date
+  dateOfHire DateTime @map("date_of_hire") @db.Date
   position Positions @relation(fields: [positionID], references: [id])
   positionID Int @map("position_id") 
   crew Crews? @relation(fields: [crewID], references: [id])
@@ -46,6 +47,9 @@ model Employees {
   baseID Int? @map("base_id")
   createdAt DateTime @map("created_at") @db.Timestamp()
   updatedAt DateTime @map("updated_at") @db.Timestamp()
+
+  leavePlan LeavePlan[]
+  rotation Rotation?
 
   @@map("employees")
 }
@@ -77,7 +81,41 @@ model Crews {
 model Positions {
   id Int @id 
   name String @db.VarChar()
-  employeed Employees[]
+  employees Employees[]
 
   @@map("positions")
+}
+
+model LeaveStatus {
+  id Int @id
+  name String @db.VarChar()
+  leavePlan LeavePlan?
+
+  @@map("leave_status")
+}
+
+model LeavePlan {
+  id Int @id @default(autoincrement())
+  employee Employees @relation(fields: [employeeID], references: [id])
+  employeeID String @map("employee_id") @db.VarChar()
+  startDate DateTime @map("start_date") @db.Date()
+  endDate DateTime @map("end_date") @db.Date()
+  status LeaveStatus @relation(fields: [leaveStatusID], references: [id])
+  leaveStatusID Int @map("leave_status_id") @unique
+  createdAt DateTime @map("created_at") @db.Timestamp()
+  updatedAt DateTime @map("updated_at") @db.Timestamp()
+
+  @@map("leave_plan")
+}
+
+model Rotation {
+  id Int @id @default(autoincrement())
+  employee Employees @relation(fields: [employeeID], references: [id])
+  employeeID String @map("employee_id") @db.VarChar() @unique
+  effectiveDate DateTime @map("effective_date") @db.Date
+  endDate DateTime @map("end_date") @db.Date
+  createdAt DateTime @map("created_at") @db.Timestamp()
+  updatedAt DateTime @map("updated_at") @db.Timestamp()
+
+  @@map("rotation")
 }

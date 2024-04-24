@@ -7,6 +7,7 @@ import { EmployeeRepository } from './employee.repository';
 import { ValidationService } from '../common/validation.service';
 import { EmployeeValidation } from './employee.validation';
 import { EmployeeDto } from './dto/employee.dto';
+import { Employee } from './entities/employee.entity';
 
 @Injectable()
 export class EmployeeService {
@@ -30,11 +31,23 @@ export class EmployeeService {
     }
 
     const createdAt = new Date();
-    validatedEmployeDto.createdAt = createdAt;
-    validatedEmployeDto.updatedAt = createdAt;
-    const employee = await this.employeeRepository.insert(validatedEmployeDto);
+    const employee: Employee = {
+      id: validatedEmployeDto.id,
+      name: validatedEmployeDto.name,
+      profilePicture: validatedEmployeDto.profilePicture,
+      dateOfBirth: validatedEmployeDto.dateOfBirth,
+      dateOfHire: validatedEmployeDto.dateOfHire,
+      positionID: validatedEmployeDto.positionID,
+      crewID: validatedEmployeDto.crewID,
+      pitID: validatedEmployeDto.pitID,
+      baseID: validatedEmployeDto.baseID,
+      createdAt: createdAt,
+      updatedAt: createdAt,
+    };
 
-    return employee;
+    const createdEmployee = await this.employeeRepository.insert(employee);
+
+    return createdEmployee;
   }
 
   async showALl(): Promise<EmployeeDto[]> {
@@ -93,13 +106,26 @@ export class EmployeeService {
       throw new HttpException(`Employee not exist`, HttpStatus.NOT_FOUND);
     }
 
-    validatedUpdateEmployeeDto.updatedAt = new Date();
-    const employee = await this.employeeRepository.update(
+    const updatedAt = new Date();
+    const employee: UpdateEmployeeDto = {
+      id: validatedUpdateEmployeeDto.id,
+      name: validatedUpdateEmployeeDto.name,
+      profilePicture: validatedUpdateEmployeeDto.profilePicture,
+      dateOfBirth: validatedUpdateEmployeeDto.dateOfBirth,
+      dateOfHire: validatedUpdateEmployeeDto.dateOfHire,
+      positionID: validatedUpdateEmployeeDto.positionID,
+      crewID: validatedUpdateEmployeeDto.crewID,
+      pitID: validatedUpdateEmployeeDto.pitID,
+      baseID: validatedUpdateEmployeeDto.baseID,
+      updatedAt: updatedAt,
+    };
+
+    const updatedEmployee = await this.employeeRepository.update(
       empID,
-      validatedUpdateEmployeeDto,
+      employee,
     );
 
-    return employee;
+    return updatedEmployee;
   }
 
   async delete(empID: string): Promise<void> {
