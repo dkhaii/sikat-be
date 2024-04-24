@@ -112,4 +112,8 @@ export class TestService {
       });
     }
   }
+
+  async deleteAllEmployee() {
+    await this.prismaService.employees.deleteMany();
+  }
 }

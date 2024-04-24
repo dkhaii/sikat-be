@@ -4,10 +4,10 @@ import * as bcrypt from 'bcrypt';
 import { faker } from '@faker-js/faker';
 import { Employee } from 'src/employee/entities/employee.entity';
 import { v4 as uuid } from 'uuid';
-import { Positions } from '../src/employee/enums/position.enum';
-import { Crews } from '../src/employee/enums/crew.enum';
-import { Pits } from '../src/employee/enums/pit.enum';
-import { Bases } from '../src/employee/enums/base.enum';
+// import { Positions } from '../src/employee/enums/position.enum';
+// import { Crews } from '../src/employee/enums/crew.enum';
+// import { Pits } from '../src/employee/enums/pit.enum';
+// import { Bases } from '../src/employee/enums/base.enum';
 
 const prisma = new PrismaClient();
 
@@ -175,8 +175,9 @@ async function seedPositions() {
 }
 
 async function seedEmployees() {
-  delay(5000);
-  const amountOfUsers = 75;
+  await new Promise((f) => setTimeout(f, 10000));
+
+  const amountOfUsers = 50;
 
   const employees: Employee[] = [];
 
@@ -186,10 +187,10 @@ async function seedEmployees() {
       name: faker.person.fullName(),
       profilePicture: uuid(),
       dateOfBirth: faker.date.birthdate(),
-      positionID: faker.helpers.enumValue(Positions),
-      crewID: faker.helpers.enumValue(Crews),
-      pitID: faker.helpers.enumValue(Pits),
-      baseID: faker.helpers.enumValue(Bases),
+      positionID: faker.helpers.arrayElement(positions).id,
+      crewID: faker.helpers.arrayElement(crews).id,
+      pitID: faker.helpers.arrayElement(pits).id,
+      baseID: faker.helpers.arrayElement(bases).id,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -205,10 +206,6 @@ async function seedEmployees() {
   }
 }
 
-function delay(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
 seedRoles()
   .then(async () => {
     await prisma.$disconnect;
@@ -216,7 +213,7 @@ seedRoles()
   .catch(async (error) => {
     console.log(error);
     await prisma.$disconnect;
-    process.exit(0);
+    // process.exit(0);
   });
 
 seedUsers()
@@ -226,7 +223,7 @@ seedUsers()
   .catch(async (error) => {
     console.log(error);
     await prisma.$disconnect;
-    process.exit(0);
+    // process.exit(0);
   });
 
 seedPositions()
@@ -236,7 +233,7 @@ seedPositions()
   .catch(async (error) => {
     console.log(error);
     await prisma.$disconnect;
-    process.exit(1);
+    // process.exit(0);
   });
 
 seedBases()
@@ -246,7 +243,7 @@ seedBases()
   .catch(async (error) => {
     console.log(error);
     await prisma.$disconnect;
-    process.exit(0);
+    // process.exit(0);
   });
 
 seedCrews()
@@ -256,7 +253,7 @@ seedCrews()
   .catch(async (error) => {
     console.log(error);
     await prisma.$disconnect;
-    process.exit(0);
+    // process.exit(0);
   });
 
 seedPits()
@@ -266,7 +263,7 @@ seedPits()
   .catch(async (error) => {
     console.log(error);
     await prisma.$disconnect;
-    process.exit(0);
+    // process.exit(0);
   });
 
 seedEmployees()

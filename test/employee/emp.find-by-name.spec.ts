@@ -31,7 +31,7 @@ describe('Employee Controller - show all employee', () => {
       await testService.deleteEmployee();
     });
 
-    const empName = 'Darrin';
+    const empName = 'mar';
 
     it('should be rejected if no authenticated user', async () => {
       logger.info(
@@ -51,6 +51,29 @@ describe('Employee Controller - show all employee', () => {
       logger.info(allEmployeeResponse.body);
 
       expect(allEmployeeResponse.status).toBe(HttpStatus.UNAUTHORIZED);
+      expect(allEmployeeResponse.body.errors).toBeDefined();
+    });
+
+    it('should be rejected if no name contains', async () => {
+      logger.info(
+        '========== should be rejected if no name contains ==========',
+      );
+
+      const loginData: LoginDto = {
+        id: '111111',
+        password: 'admin123',
+      };
+      const loginResponse = await testService.loginUser(loginData);
+      expect(loginResponse.token).toBeDefined();
+
+      const noEmpName = 'Darrin';
+
+      const allEmployeeResponse = await request(app.getHttpServer())
+        .get(`/api/auth/employees/find?name=${noEmpName}`)
+        .set('Authorization', `Bearer ${loginResponse.token}`);
+      logger.info(allEmployeeResponse.body);
+
+      expect(allEmployeeResponse.status).toBe(HttpStatus.NOT_FOUND);
       expect(allEmployeeResponse.body.errors).toBeDefined();
     });
 

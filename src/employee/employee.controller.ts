@@ -30,10 +30,10 @@ export class EmployeeController {
   @HttpCode(HttpStatus.OK)
   async addNew(
     @Body() dto: AddNewEmployeeDto,
-  ): Promise<WebResponse<AddNewEmployeeDto>> {
+  ): Promise<WebResponse<EmployeeDto>> {
     const employee = await this.employeeService.addNew(dto);
 
-    const response: WebResponse<AddNewEmployeeDto> = {
+    const response: WebResponse<EmployeeDto> = {
       message: 'success add new employee',
       data: employee,
     };

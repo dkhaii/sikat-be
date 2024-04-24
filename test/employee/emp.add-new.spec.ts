@@ -183,8 +183,6 @@ describe('Employee Controller - add new employee', () => {
     it('should be able to add new employee', async () => {
       logger.info('========== should be able to add new employee ==========');
 
-      await testService.createEmployee();
-
       const loginData: LoginDto = {
         id: '111111',
         password: 'admin123',
@@ -211,8 +209,8 @@ describe('Employee Controller - add new employee', () => {
         .send(newEmployeeData);
       logger.info(newEmployeeResponse.body);
 
-      expect(newEmployeeResponse.status).toBe(HttpStatus.BAD_REQUEST);
-      expect(newEmployeeResponse.body.errors).toBeDefined();
+      expect(newEmployeeResponse.status).toBe(HttpStatus.OK);
+      expect(newEmployeeResponse.body.data).toBeDefined();
     });
   });
 });

@@ -31,7 +31,7 @@ describe('Employee Controller - find one by ID employee', () => {
       await testService.deleteEmployee();
     });
 
-    const empID = 'e8f02c6e-44a5-46dc-9fb3-7d4e09a5d42a';
+    const empID = '302995de-7d28-4c21-86b1-95755ba0adf5';
 
     it('should be rejected if no authenticated user', async () => {
       logger.info(
