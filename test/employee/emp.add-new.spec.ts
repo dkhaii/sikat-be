@@ -12,6 +12,7 @@ import { Positions } from '../../src/employee/enums/position.enum';
 import { Crews } from '../../src/employee/enums/crew.enum';
 import { Pits } from '../../src/employee/enums/pit.enum';
 import { Bases } from '../../src/employee/enums/base.enum';
+import { CreateRotationDto } from '../../src/rotation/dto/create-rotation.dto';
 
 describe('Employee Controller - add new employee', () => {
   let app: INestApplication;
@@ -60,10 +61,14 @@ describe('Employee Controller - add new employee', () => {
         baseID: Bases.M2,
       };
 
+      const newRotation: CreateRotationDto = {
+        effectiveDate: new Date(),
+      };
+
       const newEmployeeResponse = await request(app.getHttpServer())
         .post('/api/auth/employees')
-        .set('Authorization', ' ')
-        .send(newEmployeeData);
+        .set('Authorization', '')
+        .send({ empDto: newEmployeeData, rtnDto: newRotation });
       logger.info(newEmployeeResponse.body);
 
       expect(newEmployeeResponse.status).toBe(HttpStatus.UNAUTHORIZED);
@@ -96,10 +101,14 @@ describe('Employee Controller - add new employee', () => {
         baseID: Bases.M2,
       };
 
+      const newRotation: CreateRotationDto = {
+        effectiveDate: new Date(),
+      };
+
       const newEmployeeResponse = await request(app.getHttpServer())
         .post('/api/auth/employees')
         .set('Authorization', `Bearer ${loginResponse.token}`)
-        .send(newEmployeeData);
+        .send({ empDto: newEmployeeData, rtnDto: newRotation });
       logger.info(newEmployeeResponse.body);
 
       expect(newEmployeeResponse.status).toBe(HttpStatus.FORBIDDEN);
@@ -130,10 +139,14 @@ describe('Employee Controller - add new employee', () => {
         baseID: Bases.M2,
       };
 
+      const newRotation: CreateRotationDto = {
+        effectiveDate: new Date(),
+      };
+
       const newEmployeeResponse = await request(app.getHttpServer())
         .post('/api/auth/employees')
         .set('Authorization', `Bearer ${loginResponse.token}`)
-        .send(newEmployeeData);
+        .send({ empDto: newEmployeeData, rtnDto: newRotation });
       logger.info(newEmployeeResponse.body);
 
       expect(newEmployeeResponse.status).toBe(HttpStatus.BAD_REQUEST);
@@ -166,10 +179,14 @@ describe('Employee Controller - add new employee', () => {
         baseID: Bases.M2,
       };
 
+      const newRotation: CreateRotationDto = {
+        effectiveDate: new Date(),
+      };
+
       const newEmployeeResponse = await request(app.getHttpServer())
         .post('/api/auth/employees')
         .set('Authorization', `Bearer ${loginResponse.token}`)
-        .send(newEmployeeData);
+        .send({ empDto: newEmployeeData, rtnDto: newRotation });
       logger.info(newEmployeeResponse.body);
 
       expect(newEmployeeResponse.status).toBe(HttpStatus.BAD_REQUEST);
@@ -198,14 +215,19 @@ describe('Employee Controller - add new employee', () => {
         baseID: Bases.M2,
       };
 
+      const newRotation: CreateRotationDto = {
+        effectiveDate: new Date(),
+      };
+
       const newEmployeeResponse = await request(app.getHttpServer())
         .post('/api/auth/employees')
         .set('Authorization', `Bearer ${loginResponse.token}`)
-        .send(newEmployeeData);
+        .send({ empDto: newEmployeeData, rtnDto: newRotation });
       logger.info(newEmployeeResponse.body);
 
       expect(newEmployeeResponse.status).toBe(HttpStatus.OK);
-      expect(newEmployeeResponse.body.data).toBeDefined();
+      expect(newEmployeeResponse.body.data.employee).toBeDefined();
+      expect(newEmployeeResponse.body.data.rotation).toBeDefined();
     });
   });
 });

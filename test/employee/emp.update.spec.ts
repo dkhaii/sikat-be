@@ -7,10 +7,6 @@ import { TestModule } from '../test.module';
 import { TestService } from '../test.service';
 import { Logger } from 'winston';
 import { LoginDto } from '../../src/auth/dto/login.dto';
-import { Positions } from '../../src/employee/enums/position.enum';
-// import { Crews } from '../../src/employee/enums/crew.enum';
-import { Pits } from '../../src/employee/enums/pit.enum';
-// import { Bases } from '../../src/employee/enums/base.enum';
 import { UpdateEmployeeDto } from 'src/employee/dto/update-employee.dto';
 
 describe('Employee Controller - add new employee', () => {
@@ -51,11 +47,7 @@ describe('Employee Controller - add new employee', () => {
       expect(loginResponse.token).toBeDefined();
 
       const updateEmployeeData: UpdateEmployeeDto = {
-        // id: 'zs8565',
-        name: 'Gerin Updated',
-        profilePicture: 'Mordekhai Updated',
-        positionID: Positions.SENIOR_DISPATCH_ENGINEER,
-        pitID: Pits.BINTANG,
+        profilePicture: 'Mordekhai Updated 2',
         updatedAt: new Date(),
       };
 
@@ -85,10 +77,7 @@ describe('Employee Controller - add new employee', () => {
       expect(loginResponse.token).toBeDefined();
 
       const updateEmployeeData: UpdateEmployeeDto = {
-        name: 'Gerin Updated 2',
         profilePicture: 'Mordekhai Updated 2',
-        positionID: Positions.SENIOR_DISPATCH_ENGINEER,
-        pitID: Pits.BINTANG,
         updatedAt: new Date(),
       };
 
@@ -115,10 +104,7 @@ describe('Employee Controller - add new employee', () => {
       expect(loginResponse.token).toBeDefined();
 
       const updateEmployeeData: UpdateEmployeeDto = {
-        name: 'Gerin Updated 2',
         profilePicture: 'Mordekhai Updated 2',
-        positionID: Positions.SENIOR_DISPATCH_ENGINEER,
-        pitID: Pits.BINTANG,
         updatedAt: new Date(),
       };
 
@@ -145,10 +131,7 @@ describe('Employee Controller - add new employee', () => {
       expect(loginResponse.token).toBeDefined();
 
       const updateEmployeeData: UpdateEmployeeDto = {
-        name: 'Gerin Updated 2',
-        profilePicture: 'Mordekhai Updated 2',
-        positionID: Positions.SENIOR_DISPATCH_ENGINEER,
-        pitID: Pits.BINTANG,
+        profilePicture: 'Mordekhai tampan',
         updatedAt: new Date(),
       };
 

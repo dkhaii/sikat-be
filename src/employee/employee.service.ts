@@ -8,6 +8,10 @@ import { ValidationService } from '../common/validation.service';
 import { EmployeeValidation } from './employee.validation';
 import { EmployeeDto } from './dto/employee.dto';
 import { Employee } from './entities/employee.entity';
+import { CreateRotationDto } from '../rotation/dto/create-rotation.dto';
+import { RotationService } from '../rotation/rotation.service';
+import { RotationDto } from '../rotation/dto/rotation.dto';
+import { Cron } from '@nestjs/schedule';
 
 @Injectable()
 export class EmployeeService {
@@ -15,22 +19,32 @@ export class EmployeeService {
     @Inject(WINSTON_MODULE_PROVIDER) private logger: Logger,
     private validationService: ValidationService,
     private employeeRepository: EmployeeRepository,
+    private rotationService: RotationService,
   ) {}
 
-  async addNew(dto: AddNewEmployeeDto): Promise<EmployeeDto> {
-    this.logger.info(`EmployeeService.create ${JSON.stringify(dto)}`);
+  async addNew(
+    empDto: AddNewEmployeeDto,
+    rtnDto: CreateRotationDto,
+  ): Promise<[EmployeeDto, RotationDto]> {
+    this.logger.info(
+      `EmployeeService.create empDto: ${JSON.stringify(empDto)}`,
+    );
+    this.logger.info(
+      `EmployeeService.create rtnDto: ${JSON.stringify(rtnDto)}`,
+    );
 
     const validatedEmployeDto: AddNewEmployeeDto =
-      this.validationService.validate(EmployeeValidation.ADDNEW, dto);
+      this.validationService.validate(EmployeeValidation.ADDNEW, empDto);
 
-    const isExist = await this.employeeRepository.findOneByID(
+    const isExist = await this.employeeRepository.countSameID(
       validatedEmployeDto.id,
     );
-    if (isExist != null) {
-      throw new HttpException('Employee already exist', HttpStatus.BAD_REQUEST);
+    if (isExist != 0) {
+      throw new HttpException('employee already exist', HttpStatus.BAD_REQUEST);
     }
 
     const createdAt = new Date();
+    const isArchived = true;
     const employee: Employee = {
       id: validatedEmployeDto.id,
       name: validatedEmployeDto.name,
@@ -41,13 +55,21 @@ export class EmployeeService {
       crewID: validatedEmployeDto.crewID,
       pitID: validatedEmployeDto.pitID,
       baseID: validatedEmployeDto.baseID,
+      isArchived: isArchived,
       createdAt: createdAt,
       updatedAt: createdAt,
     };
 
     const createdEmployee = await this.employeeRepository.insert(employee);
+    let createdRotation: RotationDto;
+    if (createdEmployee) {
+      createdRotation = await this.rotationService.setEffectiveDate(
+        validatedEmployeDto.id,
+        rtnDto,
+      );
+    }
 
-    return createdEmployee;
+    return [createdEmployee, createdRotation];
   }
 
   async showALl(): Promise<EmployeeDto[]> {
@@ -62,9 +84,7 @@ export class EmployeeService {
   }
 
   async findOneByID(empID: string): Promise<EmployeeDto> {
-    this.logger.info(
-      `EmployeeService.findOneCompleteByID ${JSON.stringify(empID)}`,
-    );
+    this.logger.info(`EmployeeService.findOneByID ${JSON.stringify(empID)}`);
 
     const employee = await this.employeeRepository.findOneByID(empID);
     if (employee == null) {
@@ -75,9 +95,8 @@ export class EmployeeService {
   }
 
   async findByName(empName: string): Promise<EmployeeDto[]> {
-    this.logger.info(
-      `EmployeeService.findOneCompleteByID ${JSON.stringify(empName)}`,
-    );
+    this.logger.info(`EmployeeService.findByName ${JSON.stringify(empName)}`);
+    console.log(empName);
 
     const employees = await this.employeeRepository.findByName(empName);
     if (employees.length === 0) {
@@ -87,7 +106,7 @@ export class EmployeeService {
     return employees;
   }
 
-  async update(
+  async updateProfile(
     empID: string,
     updateEmployeeDto: UpdateEmployeeDto,
   ): Promise<EmployeeDto> {
@@ -101,22 +120,17 @@ export class EmployeeService {
         updateEmployeeDto,
       );
 
-    const isEmployeeExist = await this.findOneByID(empID);
-    if (!isEmployeeExist) {
-      throw new HttpException(`Employee not exist`, HttpStatus.NOT_FOUND);
+    const isExist = await this.employeeRepository.countSameID(empID);
+    if (isExist == 0) {
+      throw new HttpException('Employee not exist', HttpStatus.NOT_FOUND);
     }
 
     const updatedAt = new Date();
     const employee: UpdateEmployeeDto = {
-      id: validatedUpdateEmployeeDto.id,
       name: validatedUpdateEmployeeDto.name,
       profilePicture: validatedUpdateEmployeeDto.profilePicture,
       dateOfBirth: validatedUpdateEmployeeDto.dateOfBirth,
       dateOfHire: validatedUpdateEmployeeDto.dateOfHire,
-      positionID: validatedUpdateEmployeeDto.positionID,
-      crewID: validatedUpdateEmployeeDto.crewID,
-      pitID: validatedUpdateEmployeeDto.pitID,
-      baseID: validatedUpdateEmployeeDto.baseID,
       updatedAt: updatedAt,
     };
 
@@ -128,14 +142,87 @@ export class EmployeeService {
     return updatedEmployee;
   }
 
-  async delete(empID: string): Promise<void> {
+  async archive(
+    empID: string,
+    rtnDto: CreateRotationDto,
+  ): Promise<[RotationDto, EmployeeDto]> {
     this.logger.info(`EmployeeService.delete ${JSON.stringify(empID)}`);
 
-    const isEmployeeExist = await this.employeeRepository.findOneByID(empID);
-    if (!isEmployeeExist) {
+    const employee = await this.employeeRepository.findOneByID(empID);
+    if (employee == null) {
       throw new HttpException('Employee not exist', HttpStatus.NOT_FOUND);
     }
 
-    await this.employeeRepository.delete(empID);
+    const endRotation = await this.rotationService.setEndDate(
+      employee.id,
+      rtnDto,
+    );
+
+    if (!endRotation) {
+      throw new HttpException(
+        'ini ada error',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+    const archiveStatus: UpdateEmployeeDto = {
+      isArchived: true,
+    };
+
+    const updatedEmployee = await this.employeeRepository.update(
+      empID,
+      archiveStatus,
+    );
+
+    return [endRotation, updatedEmployee];
+  }
+
+  @Cron('* * 17 * * *')
+  async checkArchiveEndDate() {
+    const rotations = await this.rotationService.showAll();
+    const currentDate = new Date();
+
+    for (const rotation of rotations) {
+      if (rotation.endDate == currentDate) {
+        const updateArchiveStatus: UpdateEmployeeDto = {
+          isArchived: true,
+        };
+        await this.employeeRepository.update(
+          rotation.employeeID,
+          updateArchiveStatus,
+        );
+      }
+    }
+  }
+
+  @Cron('* * 17 * * *')
+  async checkAndUpdate() {
+    const rotations = await this.rotationService.showAll();
+    const currentDate = new Date();
+
+    for (const rotation of rotations) {
+      if (rotation.effectiveDate == currentDate) {
+        const updateEmployee: UpdateEmployeeDto = {
+          positionID: rotation.positionID,
+          crewID: rotation.crewID,
+          pitID: rotation.pitID,
+          baseID: rotation.baseID,
+        };
+
+        if (updateEmployee) {
+          await this.employeeRepository.update(
+            rotation.employeeID,
+            updateEmployee,
+          );
+        }
+
+        const updateArchiveStatus: UpdateEmployeeDto = {
+          isArchived: false,
+        };
+        await this.employeeRepository.update(
+          rotation.employeeID,
+          updateArchiveStatus,
+        );
+      }
+    }
   }
 }

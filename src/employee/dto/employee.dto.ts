@@ -8,6 +8,7 @@ export class EmployeeDto {
   crew: string;
   pit: string;
   base: string;
+  isArchived: boolean;
   createdAt: Date;
   updatedAt: Date;
 }

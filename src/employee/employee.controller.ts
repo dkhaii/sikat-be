@@ -9,7 +9,6 @@ import {
   Patch,
   Param,
   Query,
-  Delete,
 } from '@nestjs/common';
 import { EmployeeService } from './employee.service';
 import { AddNewEmployeeDto } from './dto/add-new-employee.dto';
@@ -19,23 +18,38 @@ import { Roles } from '../common/role/role.decorator';
 import { Role } from '../common/role/role.enum';
 import { EmployeeDto } from './dto/employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
+import { CreateRotationDto } from '../rotation/dto/create-rotation.dto';
+import { RotationDto } from '../rotation/dto/rotation.dto';
+import { RotationService } from '../rotation/rotation.service';
+import { UpdateRotationDto } from '../rotation/dto/update-rotation.dto';
 
 @Controller('/api/auth/employees')
 export class EmployeeController {
-  constructor(private readonly employeeService: EmployeeService) {}
+  constructor(
+    private readonly employeeService: EmployeeService,
+    private readonly rotationService: RotationService,
+  ) {}
 
   @Post()
   @UseGuards(RolesGuard)
   @Roles(Role.SUPERINTENDENT)
   @HttpCode(HttpStatus.OK)
   async addNew(
-    @Body() dto: AddNewEmployeeDto,
-  ): Promise<WebResponse<EmployeeDto>> {
-    const employee = await this.employeeService.addNew(dto);
+    @Body('empDto') empDto: AddNewEmployeeDto,
+    @Body('rtnDto') rtnDto: CreateRotationDto,
+  ): Promise<WebResponse<{ employee: EmployeeDto; rotation: RotationDto }>> {
+    const [createdEmployee, createdRotation] =
+      await this.employeeService.addNew(empDto, rtnDto);
 
-    const response: WebResponse<EmployeeDto> = {
+    const response: WebResponse<{
+      employee: EmployeeDto;
+      rotation: RotationDto;
+    }> = {
       message: 'success add new employee',
-      data: employee,
+      data: {
+        employee: createdEmployee,
+        rotation: createdRotation,
+      },
     };
 
     return response;
@@ -43,13 +57,17 @@ export class EmployeeController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  async showAll(): Promise<WebResponse<EmployeeDto[]>> {
-    const employees = await this.employeeService.showALl();
+  async showAll(): Promise<WebResponse<{ employee: EmployeeDto[] }>> {
+    const employeeDtos = await this.employeeService.showALl();
 
-    const response: WebResponse<EmployeeDto[]> = {
+    const response: WebResponse<{ employee: EmployeeDto[] }> = {
       message: 'success show all employees',
-      data: employees,
+      data: {
+        employee: employeeDtos,
+      },
     };
+
+    console.log(response);
 
     return response;
   }
@@ -58,12 +76,14 @@ export class EmployeeController {
   @HttpCode(HttpStatus.OK)
   async findOneByID(
     @Param('id') id: string,
-  ): Promise<WebResponse<EmployeeDto>> {
-    const employee = await this.employeeService.findOneByID(id);
+  ): Promise<WebResponse<{ employee: EmployeeDto }>> {
+    const employeeDto = await this.employeeService.findOneByID(id);
 
-    const response: WebResponse<EmployeeDto> = {
+    const response: WebResponse<{ employee: EmployeeDto }> = {
       message: 'success find employee',
-      data: employee,
+      data: {
+        employee: employeeDto,
+      },
     };
 
     return response;
@@ -73,12 +93,14 @@ export class EmployeeController {
   @HttpCode(HttpStatus.OK)
   async findByName(
     @Query('name') name: string,
-  ): Promise<WebResponse<EmployeeDto[]>> {
-    const employees = await this.employeeService.findByName(name);
+  ): Promise<WebResponse<{ employee: EmployeeDto[] }>> {
+    const employeeDtos = await this.employeeService.findByName(name);
 
-    const response: WebResponse<EmployeeDto[]> = {
+    const response: WebResponse<{ employee: EmployeeDto[] }> = {
       message: 'success find employee',
-      data: employees,
+      data: {
+        employee: employeeDtos,
+      },
     };
 
     return response;
@@ -91,26 +113,37 @@ export class EmployeeController {
   async update(
     @Param('id') id: string,
     @Body() dto: UpdateEmployeeDto,
-  ): Promise<WebResponse<EmployeeDto>> {
-    const updatedEmployee = await this.employeeService.update(id, dto);
+  ): Promise<WebResponse<{ employee: EmployeeDto }>> {
+    const updatedEmployeeDto = await this.employeeService.updateProfile(
+      id,
+      dto,
+    );
 
-    const response: WebResponse<EmployeeDto> = {
-      message: `success update employee ${updatedEmployee.id}`,
-      data: updatedEmployee,
+    const response: WebResponse<{ employee: EmployeeDto }> = {
+      message: `success update employee ${updatedEmployeeDto.id}`,
+      data: {
+        employee: updatedEmployeeDto,
+      },
     };
 
     return response;
   }
 
-  @Delete('/delete/:id')
+  @Post('/rotation/:id')
   @UseGuards(RolesGuard)
   @Roles(Role.SUPERINTENDENT)
   @HttpCode(HttpStatus.OK)
-  async delete(@Param('id') id: string): Promise<WebResponse<void>> {
-    await this.employeeService.delete(id);
+  async setRotation(
+    @Param('id') id: string,
+    @Body() dto: UpdateRotationDto,
+  ): Promise<WebResponse<{ rotation: RotationDto }>> {
+    const rotationDto = await this.rotationService.create(id, dto);
 
-    const response: WebResponse<void> = {
-      message: `success delete user ${id}`,
+    const response: WebResponse<{ rotation: RotationDto }> = {
+      message: 'success create rotation',
+      data: {
+        rotation: rotationDto,
+      },
     };
 
     return response;

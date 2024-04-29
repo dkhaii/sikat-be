@@ -9,6 +9,7 @@ import { Positions } from '../src/employee/enums/position.enum';
 import { Crews } from '../src/employee/enums/crew.enum';
 import { Pits } from '../src/employee/enums/pit.enum';
 import { Bases } from '../src/employee/enums/base.enum';
+import { Rotation } from '../src/rotation/entities/rotation.entity';
 
 @Injectable()
 export class TestService {
@@ -76,7 +77,7 @@ export class TestService {
   }
 
   async createEmployee() {
-    await this.prismaService.employees.create({
+    const employee = await this.prismaService.employees.create({
       data: {
         id: 'zs8565',
         name: 'Mordekhai Gerin',
@@ -87,10 +88,52 @@ export class TestService {
         crewID: Crews.ALPHA,
         pitID: Pits.BINTANG,
         baseID: Bases.M2,
+        isArchived: true,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
     });
+
+    if (employee) {
+      await this.prismaService.rotation.create({
+        data: {
+          employeeID: 'zs8565',
+          effectiveDate: new Date(),
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      });
+    }
+  }
+
+  async createEmployeeWithFalseArchived() {
+    const employee = await this.prismaService.employees.create({
+      data: {
+        id: '99999',
+        name: 'Mordekhai',
+        profilePicture: 'gerin',
+        dateOfBirth: new Date(),
+        dateOfHire: new Date(),
+        positionID: Positions.GDP,
+        crewID: Crews.ALPHA,
+        pitID: Pits.BINTANG,
+        baseID: Bases.M2,
+        isArchived: false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    });
+
+    if (employee) {
+      await this.prismaService.rotation.create({
+        data: {
+          employeeID: '99999',
+          effectiveDate: new Date(),
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      });
+    }
   }
 
   async findOneEmployee(badgeNum: string): Promise<Employee> {
@@ -103,9 +146,32 @@ export class TestService {
     return employee;
   }
 
+  async findOneRotation(badgeNum: string): Promise<Rotation> {
+    const rotation: Rotation = await this.prismaService.rotation.findUnique({
+      where: {
+        employeeID: badgeNum,
+      },
+    });
+
+    return rotation;
+  }
+
   async deleteEmployee() {
     const employee = await this.findOneEmployee('zs8565');
     if (employee) {
+      const rotation = await this.prismaService.rotation.findUnique({
+        where: {
+          employeeID: 'zs8565',
+        },
+      });
+      if (rotation) {
+        await this.prismaService.rotation.delete({
+          where: {
+            employeeID: 'zs8565',
+          },
+        });
+      }
+
       await this.prismaService.employees.delete({
         where: {
           id: 'zs8565',
@@ -114,7 +180,42 @@ export class TestService {
     }
   }
 
+  async deleteEmployeeWithFalseArchived() {
+    const employee = await this.findOneEmployee('99999');
+    if (employee) {
+      const rotation = await this.prismaService.rotation.findUnique({
+        where: {
+          employeeID: '99999',
+        },
+      });
+      if (rotation) {
+        await this.prismaService.rotation.delete({
+          where: {
+            employeeID: '99999',
+          },
+        });
+      }
+
+      await this.prismaService.employees.delete({
+        where: {
+          id: '99999',
+        },
+      });
+    }
+  }
+
   async deleteAllEmployee() {
     await this.prismaService.employees.deleteMany();
   }
+
+  // async deleteRotation() {
+  //   const rotation = await this.findOneRotation('zs8565');
+  //   if (rotation) {
+  //     await this.prismaService.rotation.delete({
+  //       where: {
+  //         employeeID: 'zs8565',
+  //       },
+  //     });
+  //   }
+  // }
 }

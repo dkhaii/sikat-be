@@ -27,6 +27,7 @@ CREATE TABLE "employees" (
     "crew_id" INTEGER,
     "pit_id" INTEGER,
     "base_id" INTEGER,
+    "is_archived" BOOLEAN NOT NULL DEFAULT true,
     "created_at" TIMESTAMP NOT NULL,
     "updated_at" TIMESTAMP NOT NULL,
 
@@ -90,12 +91,29 @@ CREATE TABLE "leave_plan" (
 CREATE TABLE "rotation" (
     "id" SERIAL NOT NULL,
     "employee_id" VARCHAR NOT NULL,
-    "effective_date" DATE NOT NULL,
-    "end_date" DATE NOT NULL,
+    "effective_date" DATE,
+    "end_date" DATE,
+    "position_id" INTEGER,
+    "crew_id" INTEGER,
+    "pit_id" INTEGER,
+    "base_id" INTEGER,
     "created_at" TIMESTAMP NOT NULL,
     "updated_at" TIMESTAMP NOT NULL,
 
     CONSTRAINT "rotation_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "employee_log" (
+    "id" SERIAL NOT NULL,
+    "employee_id" VARCHAR NOT NULL,
+    "position" VARCHAR NOT NULL,
+    "crew" VARCHAR NOT NULL,
+    "pit" VARCHAR NOT NULL,
+    "base" VARCHAR NOT NULL,
+    "created_at" TIMESTAMP NOT NULL,
+
+    CONSTRAINT "employee_log_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -127,3 +145,18 @@ ALTER TABLE "leave_plan" ADD CONSTRAINT "leave_plan_leave_status_id_fkey" FOREIG
 
 -- AddForeignKey
 ALTER TABLE "rotation" ADD CONSTRAINT "rotation_employee_id_fkey" FOREIGN KEY ("employee_id") REFERENCES "employees"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "rotation" ADD CONSTRAINT "rotation_position_id_fkey" FOREIGN KEY ("position_id") REFERENCES "positions"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "rotation" ADD CONSTRAINT "rotation_crew_id_fkey" FOREIGN KEY ("crew_id") REFERENCES "crews"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "rotation" ADD CONSTRAINT "rotation_pit_id_fkey" FOREIGN KEY ("pit_id") REFERENCES "pits"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "rotation" ADD CONSTRAINT "rotation_base_id_fkey" FOREIGN KEY ("base_id") REFERENCES "bases"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "employee_log" ADD CONSTRAINT "employee_log_employee_id_fkey" FOREIGN KEY ("employee_id") REFERENCES "employees"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

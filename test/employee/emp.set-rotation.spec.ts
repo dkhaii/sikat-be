@@ -7,6 +7,8 @@ import { TestModule } from '../test.module';
 import { TestService } from '../test.service';
 import { Logger } from 'winston';
 import { LoginDto } from '../../src/auth/dto/login.dto';
+import { Positions } from '../../src/employee/enums/position.enum';
+import { UpdateRotationDto } from '../../src/rotation/dto/update-rotation.dto';
 
 describe('Employee Controller - add new employee', () => {
   let app: INestApplication;
@@ -25,7 +27,7 @@ describe('Employee Controller - add new employee', () => {
     testService = app.get(TestService);
   });
 
-  describe('POST /api/auth/employees', () => {
+  describe('POST /api/auth/employees/rotation', () => {
     beforeEach(async () => {
       await testService.deleteUser();
       await testService.deleteEmployee();
@@ -45,13 +47,18 @@ describe('Employee Controller - add new employee', () => {
       const loginResponse = await testService.loginUser(loginData);
       expect(loginResponse.token).toBeDefined();
 
-      const updateEmployeeResponse = await request(app.getHttpServer())
-        .delete(`/api/auth/employees/delete/${empID}`)
-        .set('Authorization', ' ');
-      logger.info(updateEmployeeResponse.body);
+      const rotationData: UpdateRotationDto = {
+        positionID: Positions.SUPERVISOR,
+      };
 
-      expect(updateEmployeeResponse.status).toBe(HttpStatus.UNAUTHORIZED);
-      expect(updateEmployeeResponse.body.errors).toBeDefined();
+      const newEmployeeResponse = await request(app.getHttpServer())
+        .post(`/api/auth/employees/rotation/${empID}`)
+        .set('Authorization', '')
+        .send(rotationData);
+      logger.info(newEmployeeResponse.body);
+
+      expect(newEmployeeResponse.status).toBe(HttpStatus.UNAUTHORIZED);
+      expect(newEmployeeResponse.body.errors).toBeDefined();
     });
 
     it('should be rejected if authenticated user is supervisor', async () => {
@@ -60,6 +67,7 @@ describe('Employee Controller - add new employee', () => {
       );
 
       await testService.createSupvUser();
+      await testService.createEmployee();
 
       const loginData: LoginDto = {
         id: 'zs8566',
@@ -68,38 +76,23 @@ describe('Employee Controller - add new employee', () => {
       const loginResponse = await testService.loginUser(loginData);
       expect(loginResponse.token).toBeDefined();
 
-      const updateEmployeeResponse = await request(app.getHttpServer())
-        .delete(`/api/auth/employees/delete/${empID}`)
-        .set('Authorization', `Bearer ${loginResponse.token}`);
-      logger.info(updateEmployeeResponse.body);
-
-      expect(updateEmployeeResponse.status).toBe(HttpStatus.FORBIDDEN);
-      expect(updateEmployeeResponse.body.errors).toBeDefined();
-    });
-
-    it('should be rejected if no employee exist', async () => {
-      logger.info(
-        '========== should be rejected if no employee exist ==========',
-      );
-
-      const loginData: LoginDto = {
-        id: '111111',
-        password: 'admin123',
+      const rotationData: UpdateRotationDto = {
+        positionID: Positions.SUPERVISOR,
+        effectiveDate: new Date(2024, 4, 30),
       };
-      const loginResponse = await testService.loginUser(loginData);
-      expect(loginResponse.token).toBeDefined();
 
-      const updateEmployeeResponse = await request(app.getHttpServer())
-        .delete(`/api/auth/employees/delete/${empID}`)
-        .set('Authorization', `Bearer ${loginResponse.token}`);
-      logger.info(updateEmployeeResponse.body);
+      const newEmployeeResponse = await request(app.getHttpServer())
+        .post(`/api/auth/employees/rotation/${empID}`)
+        .set('Authorization', `Bearer ${loginResponse.token}`)
+        .send(rotationData);
+      logger.info(newEmployeeResponse.body);
 
-      expect(updateEmployeeResponse.status).toBe(HttpStatus.NOT_FOUND);
-      expect(updateEmployeeResponse.body.errors).toBeDefined();
+      expect(newEmployeeResponse.status).toBe(HttpStatus.FORBIDDEN);
+      expect(newEmployeeResponse.body.errors).toBeDefined();
     });
 
-    it('should be able to delete employee', async () => {
-      logger.info('========== should be able to delete employee ==========');
+    it('should be able to set rotation', async () => {
+      logger.info('========== should be able to set rotation ==========');
 
       await testService.createEmployee();
 
@@ -110,12 +103,19 @@ describe('Employee Controller - add new employee', () => {
       const loginResponse = await testService.loginUser(loginData);
       expect(loginResponse.token).toBeDefined();
 
-      const updateEmployeeResponse = await request(app.getHttpServer())
-        .delete(`/api/auth/employees/delete/${empID}`)
-        .set('Authorization', `Bearer ${loginResponse.token}`);
-      logger.info(updateEmployeeResponse.body);
+      const rotationData: UpdateRotationDto = {
+        positionID: Positions.SUPERVISOR,
+        effectiveDate: new Date(2024, 4, 30),
+      };
 
-      expect(updateEmployeeResponse.status).toBe(HttpStatus.OK);
+      const newEmployeeResponse = await request(app.getHttpServer())
+        .post(`/api/auth/employees/rotation/${empID}`)
+        .set('Authorization', `Bearer ${loginResponse.token}`)
+        .send(rotationData);
+      logger.info(newEmployeeResponse.body);
+
+      expect(newEmployeeResponse.status).toBe(HttpStatus.OK);
+      expect(newEmployeeResponse.body.data).toBeDefined();
     });
   });
 });

@@ -4,10 +4,6 @@ import * as bcrypt from 'bcrypt';
 import { faker } from '@faker-js/faker';
 import { Employee } from 'src/employee/entities/employee.entity';
 import { v4 as uuid } from 'uuid';
-// import { Positions } from '../src/employee/enums/position.enum';
-// import { Crews } from '../src/employee/enums/crew.enum';
-// import { Pits } from '../src/employee/enums/pit.enum';
-// import { Bases } from '../src/employee/enums/base.enum';
 
 const prisma = new PrismaClient();
 
@@ -207,6 +203,7 @@ async function seedEmployees() {
       crewID: faker.helpers.arrayElement(crews).id,
       pitID: faker.helpers.arrayElement(pits).id,
       baseID: faker.helpers.arrayElement(bases).id,
+      isArchived: faker.datatype.boolean(),
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -217,7 +214,20 @@ async function seedEmployees() {
 
   for (const employee of employees) {
     await prisma.employees.create({
-      data: employee,
+      data: {
+        id: employee.id,
+        name: employee.name,
+        profilePicture: employee.profilePicture,
+        dateOfBirth: employee.dateOfBirth,
+        dateOfHire: employee.dateOfHire,
+        positionID: employee.positionID,
+        crewID: employee.crewID,
+        pitID: employee.pitID,
+        baseID: employee.baseID,
+        isArchived: employee.isArchived,
+        createdAt: employee.createdAt,
+        updatedAt: employee.updatedAt,
+      },
     });
   }
 }

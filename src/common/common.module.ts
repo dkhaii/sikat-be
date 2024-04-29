@@ -6,6 +6,7 @@ import { PrismaService } from './prisma.service';
 import { ValidationService } from './validation.service';
 import { APP_FILTER } from '@nestjs/core';
 import { ErrorFilter } from './error.filter';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Global()
 @Module({
@@ -18,6 +19,7 @@ import { ErrorFilter } from './error.filter';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    ScheduleModule.forRoot(),
   ],
   providers: [
     PrismaService,

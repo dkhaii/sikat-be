@@ -26,13 +26,6 @@ describe('Employee Controller - show all employee', () => {
   });
 
   describe('POST /api/auth/employees', () => {
-    beforeEach(async () => {
-      await testService.deleteUser();
-      await testService.deleteEmployee();
-    });
-
-    const empName = 'mar';
-
     it('should be rejected if no authenticated user', async () => {
       logger.info(
         '========== should be rejected if no authenticated user ==========',
@@ -89,6 +82,7 @@ describe('Employee Controller - show all employee', () => {
       const loginResponse = await testService.loginUser(loginData);
       expect(loginResponse.token).toBeDefined();
 
+      const empName = 'jes';
       const allEmployeeResponse = await request(app.getHttpServer())
         .get(`/api/auth/employees/find?name=${empName}`)
         .set('Authorization', `Bearer ${loginResponse.token}`);

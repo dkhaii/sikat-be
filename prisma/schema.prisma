@@ -32,7 +32,7 @@ model Users {
 }
 
 model Employees {
-  id String @id 
+  id String @id @unique
   name String @db.VarChar()
   profilePicture String? @map("profile_picture") @db.VarChar() 
   dateOfBirth DateTime @map("date_of_birth") @db.Date
@@ -45,11 +45,13 @@ model Employees {
   pitID Int? @map("pit_id")
   base Bases? @relation(fields: [baseID], references: [id])
   baseID Int? @map("base_id")
+  isArchived Boolean @map("is_archived") @db.Boolean @default(true)
   createdAt DateTime @map("created_at") @db.Timestamp()
   updatedAt DateTime @map("updated_at") @db.Timestamp()
 
   leavePlan LeavePlan[]
   rotation Rotation?
+  employeeLog EmployeeLog[]
 
   @@map("employees")
 }
@@ -58,6 +60,7 @@ model Pits {
   id Int @id
   name String @db.VarChar()
   employees Employees[]
+  rotation Rotation[]
 
   @@map("pits")
 }
@@ -66,6 +69,7 @@ model Bases {
   id Int @id 
   name String @db.VarChar()
   employees Employees[]
+  rotation Rotation[]
 
   @@map("bases")
 }
@@ -74,6 +78,7 @@ model Crews {
   id Int @id 
   name String @db.VarChar()
   employees Employees[]
+  rotation Rotation[]
 
   @@map("crews")
 }
@@ -82,6 +87,7 @@ model Positions {
   id Int @id 
   name String @db.VarChar()
   employees Employees[]
+  rotation Rotation[]
 
   @@map("positions")
 }
@@ -112,10 +118,31 @@ model Rotation {
   id Int @id @default(autoincrement())
   employee Employees @relation(fields: [employeeID], references: [id])
   employeeID String @map("employee_id") @db.VarChar() @unique
-  effectiveDate DateTime @map("effective_date") @db.Date
-  endDate DateTime @map("end_date") @db.Date
+  effectiveDate DateTime? @map("effective_date") @db.Date
+  endDate DateTime? @map("end_date") @db.Date
+  position Positions? @relation(fields: [positionID], references: [id])
+  positionID Int? @map("position_id")
+  crew Crews? @relation(fields: [crewID], references: [id])
+  crewID Int? @map("crew_id")
+  pit Pits? @relation(fields: [pitID], references: [id])
+  pitID Int? @map("pit_id")
+  base Bases? @relation(fields: [baseID], references: [id])
+  baseID Int? @map("base_id")
   createdAt DateTime @map("created_at") @db.Timestamp()
   updatedAt DateTime @map("updated_at") @db.Timestamp()
 
   @@map("rotation")
+}
+
+model EmployeeLog {
+  id Int @id @default(autoincrement())
+  employee Employees @relation(fields: [employeeID], references: [id])
+  employeeID String @map("employee_id") @db.VarChar()
+  position String @db.VarChar()
+  crew String @db.VarChar()
+  pit String @db.VarChar()
+  base String @db.VarChar()
+  createdAt DateTime @map("created_at") @db.Timestamp()
+
+  @@map("employee_log")
 }

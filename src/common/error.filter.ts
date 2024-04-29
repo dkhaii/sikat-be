@@ -36,7 +36,9 @@ export class ErrorFilter implements ExceptionFilter {
     }
 
     return response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-      errors: exception.message,
+      status: exception.getStatus(),
+      message: exception.message,
+      errors: exception.getResponse(),
     });
   }
 }
