@@ -52,7 +52,7 @@ describe('Employee Controller - add new employee', () => {
       };
 
       const updateEmployeeResponse = await request(app.getHttpServer())
-        .post('/api/auth/employees')
+        .patch(`/api/auth/employees/update/${empID}`)
         .set('Authorization', ' ')
         .send(updateEmployeeData);
       logger.info(updateEmployeeResponse.body);
