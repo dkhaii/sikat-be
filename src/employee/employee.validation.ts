@@ -19,5 +19,10 @@ export class EmployeeValidation {
     profilePicture: z.string().optional(),
     dateOfBirth: z.string().optional(),
     dateOfHire: z.string().optional(),
+    positionID: z.number().optional(),
+    crewID: z.number().optional(),
+    pitID: z.number().optional(),
+    baseID: z.number().optional(),
+    isArchived: z.boolean().optional(),
   });
 }

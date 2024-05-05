@@ -4,6 +4,7 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { EmployeeModule } from './employee/employee.module';
 import { RotationModule } from './rotation/rotation.module';
+import { EmployeeLogModule } from './employee-log/employee-log.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { RotationModule } from './rotation/rotation.module';
     AuthModule,
     EmployeeModule,
     RotationModule,
+    EmployeeLogModule,
   ],
 })
 export class AppModule {}

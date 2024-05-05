@@ -108,13 +108,16 @@ CREATE TABLE "employee_log" (
     "id" SERIAL NOT NULL,
     "employee_id" VARCHAR NOT NULL,
     "position" VARCHAR NOT NULL,
-    "crew" VARCHAR NOT NULL,
-    "pit" VARCHAR NOT NULL,
-    "base" VARCHAR NOT NULL,
+    "crew" VARCHAR,
+    "pit" VARCHAR,
+    "base" VARCHAR,
     "created_at" TIMESTAMP NOT NULL,
 
     CONSTRAINT "employee_log_pkey" PRIMARY KEY ("id")
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "employees_id_key" ON "employees"("id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "leave_plan_leave_status_id_key" ON "leave_plan"("leave_status_id");

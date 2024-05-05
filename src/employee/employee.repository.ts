@@ -129,6 +129,7 @@ export class EmployeeRepository {
         crewID: dto.crewID,
         pitID: dto.pitID,
         baseID: dto.baseID,
+        isArchived: dto.isArchived,
         updatedAt: dto.updatedAt,
       },
       include: {
@@ -157,16 +158,22 @@ export class EmployeeRepository {
       id: employee.id,
       name: employee.name,
       profilePicture: employee.profilePicture,
-      dateOfBirth: employee.dateOfBirth,
-      dateOfHire: employee.dateOfHire,
-      position: employee.position.name,
-      crew: employee.crew.name,
-      pit: employee.pit.name,
-      base: employee.base.name,
+      dateOfBirthStr: employee.dateOfBirth.toLocaleString('id-ID', {
+        dateStyle: 'short',
+      }),
+      dateOfHireStr: employee.dateOfHire.toLocaleString('id-ID', {
+        dateStyle: 'short',
+      }),
+      positionName: employee.position.name,
+      crewName: employee.crew.name,
+      pitName: employee.pit.name,
+      baseName: employee.base.name,
       isArchived: employee.isArchived,
-      createdAt: employee.createdAt,
-      updatedAt: employee.updatedAt,
+      createdAtStr: employee.createdAt.toLocaleString(),
+      updatedAtStr: employee.updatedAt.toLocaleString(),
     };
+
+    console.log(employeeDto);
 
     return employeeDto;
   }

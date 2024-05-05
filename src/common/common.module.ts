@@ -7,6 +7,7 @@ import { ValidationService } from './validation.service';
 import { APP_FILTER } from '@nestjs/core';
 import { ErrorFilter } from './error.filter';
 import { ScheduleModule } from '@nestjs/schedule';
+import { HelperService } from './helper.service';
 
 @Global()
 @Module({
@@ -28,7 +29,8 @@ import { ScheduleModule } from '@nestjs/schedule';
       provide: APP_FILTER,
       useClass: ErrorFilter,
     },
+    HelperService,
   ],
-  exports: [PrismaService, ValidationService],
+  exports: [PrismaService, ValidationService, HelperService],
 })
 export class CommonModule {}

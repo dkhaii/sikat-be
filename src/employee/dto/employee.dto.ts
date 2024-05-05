@@ -1,14 +1,14 @@
-export class EmployeeDto {
-  id: string;
-  name: string;
-  profilePicture: string;
-  dateOfBirth: Date;
-  dateOfHire: Date;
-  position: string;
-  crew: string;
-  pit: string;
-  base: string;
+import { PartialType } from '@nestjs/mapped-types';
+import { Employee } from '../entities/employee.entity';
+
+export class EmployeeDto extends PartialType(Employee) {
+  dateOfBirthStr: string;
+  dateOfHireStr: string;
+  positionName: string;
+  crewName: string;
+  pitName: string;
+  baseName: string;
   isArchived: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAtStr: string;
+  updatedAtStr: string;
 }

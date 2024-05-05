@@ -114,10 +114,7 @@ export class EmployeeController {
     @Param('id') id: string,
     @Body() dto: UpdateEmployeeDto,
   ): Promise<WebResponse<{ employee: EmployeeDto }>> {
-    const updatedEmployeeDto = await this.employeeService.updateProfile(
-      id,
-      dto,
-    );
+    const updatedEmployeeDto = await this.employeeService.update(id, dto);
 
     const response: WebResponse<{ employee: EmployeeDto }> = {
       message: `success update employee ${updatedEmployeeDto.id}`,
@@ -143,6 +140,26 @@ export class EmployeeController {
       message: 'success create rotation',
       data: {
         rotation: rotationDto,
+      },
+    };
+
+    return response;
+  }
+
+  @Patch('/archive/:id')
+  @UseGuards(RolesGuard)
+  @Roles(Role.SUPERINTENDENT)
+  @HttpCode(HttpStatus.OK)
+  async setArchiveDate(
+    @Param('id') id: string,
+    @Body() dto: CreateRotationDto,
+  ): Promise<WebResponse<{ rotation: RotationDto }>> {
+    const setArchiveDate = await this.employeeService.setArchiveDate(id, dto);
+
+    const response: WebResponse<{ rotation: RotationDto }> = {
+      message: 'success create rotation',
+      data: {
+        rotation: setArchiveDate,
       },
     };
 

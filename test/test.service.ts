@@ -10,6 +10,8 @@ import { Crews } from '../src/employee/enums/crew.enum';
 import { Pits } from '../src/employee/enums/pit.enum';
 import { Bases } from '../src/employee/enums/base.enum';
 import { Rotation } from '../src/rotation/entities/rotation.entity';
+import { v4 as uuid } from 'uuid';
+import { faker } from '@faker-js/faker';
 
 @Injectable()
 export class TestService {
@@ -104,6 +106,8 @@ export class TestService {
         },
       });
     }
+
+    return employee;
   }
 
   async createEmployeeWithFalseArchived() {
@@ -134,6 +138,229 @@ export class TestService {
         },
       });
     }
+  }
+
+  async createEmployeeWithEndDate(date: string) {
+    const amountOfEmployees = 2;
+
+    const employees: Employee[] = [];
+
+    for (let i = 0; i < amountOfEmployees; i++) {
+      const employee: Employee = {
+        id: uuid(),
+        name: faker.person.fullName(),
+        profilePicture: uuid(),
+        dateOfBirth: faker.date.birthdate(),
+        dateOfHire: faker.date.past(),
+        positionID: faker.helpers.enumValue(Positions),
+        crewID: faker.helpers.enumValue(Crews),
+        pitID: faker.helpers.enumValue(Pits),
+        baseID: faker.helpers.enumValue(Bases),
+        isArchived: false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      employees.push(employee);
+    }
+    console.log(employees);
+
+    for (const employee of employees) {
+      const createdEmployee = await this.prismaService.employees.create({
+        data: {
+          id: employee.id,
+          name: employee.name,
+          profilePicture: employee.profilePicture,
+          dateOfBirth: employee.dateOfBirth,
+          dateOfHire: employee.dateOfHire,
+          positionID: employee.positionID,
+          crewID: employee.crewID,
+          pitID: employee.pitID,
+          baseID: employee.baseID,
+          isArchived: employee.isArchived,
+          createdAt: employee.createdAt,
+          updatedAt: employee.updatedAt,
+        },
+      });
+
+      if (createdEmployee) {
+        const rotation = await this.prismaService.rotation.create({
+          data: {
+            employeeID: createdEmployee.id,
+            endDate: new Date(date),
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+        });
+
+        console.log(rotation);
+      }
+    }
+  }
+
+  async createEmployeeWithEffectiveDate() {
+    const amountOfEmployees = 3;
+
+    const employees: Employee[] = [];
+
+    for (let i = 0; i < amountOfEmployees; i++) {
+      const employee: Employee = {
+        id: uuid(),
+        name: faker.person.fullName(),
+        profilePicture: uuid(),
+        dateOfBirth: faker.date.birthdate(),
+        dateOfHire: faker.date.past(),
+        positionID: faker.helpers.enumValue(Positions),
+        crewID: faker.helpers.enumValue(Crews),
+        pitID: faker.helpers.enumValue(Pits),
+        baseID: faker.helpers.enumValue(Bases),
+        isArchived: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      employees.push(employee);
+    }
+    console.log(employees);
+
+    for (const employee of employees) {
+      const createdEmployee = await this.prismaService.employees.create({
+        data: {
+          id: employee.id,
+          name: employee.name,
+          profilePicture: employee.profilePicture,
+          dateOfBirth: employee.dateOfBirth,
+          dateOfHire: employee.dateOfHire,
+          positionID: employee.positionID,
+          crewID: employee.crewID,
+          pitID: employee.pitID,
+          baseID: employee.baseID,
+          isArchived: employee.isArchived,
+          createdAt: employee.createdAt,
+          updatedAt: employee.updatedAt,
+        },
+      });
+
+      if (createdEmployee) {
+        await this.prismaService.rotation.create({
+          data: {
+            employeeID: createdEmployee.id,
+            effectiveDate: new Date(2024, 4, 5),
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+        });
+      }
+    }
+  }
+
+  async createEmployeeWithSettedRotation() {
+    const amountOfEmployees = 3;
+
+    const employees: Employee[] = [];
+
+    for (let i = 0; i < amountOfEmployees; i++) {
+      const employee: Employee = {
+        id: uuid(),
+        name: faker.person.fullName(),
+        profilePicture: uuid(),
+        dateOfBirth: faker.date.birthdate(),
+        dateOfHire: faker.date.past(),
+        positionID: faker.helpers.enumValue(Positions),
+        crewID: faker.helpers.enumValue(Crews),
+        pitID: faker.helpers.enumValue(Pits),
+        baseID: faker.helpers.enumValue(Bases),
+        isArchived: false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      employees.push(employee);
+    }
+    console.log(employees);
+
+    for (const employee of employees) {
+      const createdEmployee = await this.prismaService.employees.create({
+        data: {
+          id: employee.id,
+          name: employee.name,
+          profilePicture: employee.profilePicture,
+          dateOfBirth: employee.dateOfBirth,
+          dateOfHire: employee.dateOfHire,
+          positionID: employee.positionID,
+          crewID: employee.crewID,
+          pitID: employee.pitID,
+          baseID: employee.baseID,
+          isArchived: employee.isArchived,
+          createdAt: employee.createdAt,
+          updatedAt: employee.updatedAt,
+        },
+      });
+
+      if (createdEmployee) {
+        await this.prismaService.rotation.create({
+          data: {
+            employeeID: createdEmployee.id,
+            effectiveDate: new Date(2024, 4, 5),
+            positionID: faker.helpers.enumValue(Positions),
+            pitID: faker.helpers.enumValue(Pits),
+            baseID: faker.helpers.enumValue(Bases),
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+        });
+      }
+    }
+  }
+
+  async createOneEmployeeWithSettedRotation() {
+    const employee: Employee = {
+      id: uuid(),
+      name: faker.person.fullName(),
+      profilePicture: uuid(),
+      dateOfBirth: faker.date.birthdate(),
+      dateOfHire: faker.date.past(),
+      positionID: faker.helpers.enumValue(Positions),
+      crewID: faker.helpers.enumValue(Crews),
+      pitID: faker.helpers.enumValue(Pits),
+      baseID: faker.helpers.enumValue(Bases),
+      isArchived: false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    const createdEmployee = await this.prismaService.employees.create({
+      data: {
+        id: employee.id,
+        name: employee.name,
+        profilePicture: employee.profilePicture,
+        dateOfBirth: employee.dateOfBirth,
+        dateOfHire: employee.dateOfHire,
+        positionID: employee.positionID,
+        crewID: employee.crewID,
+        pitID: employee.pitID,
+        baseID: employee.baseID,
+        isArchived: employee.isArchived,
+        createdAt: employee.createdAt,
+        updatedAt: employee.updatedAt,
+      },
+    });
+
+    if (createdEmployee) {
+      await this.prismaService.rotation.create({
+        data: {
+          employeeID: createdEmployee.id,
+          effectiveDate: new Date(2024, 4, 5),
+          positionID: faker.helpers.enumValue(Positions),
+          pitID: faker.helpers.enumValue(Pits),
+          baseID: faker.helpers.enumValue(Bases),
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      });
+    }
+
+    return employee;
   }
 
   async findOneEmployee(badgeNum: string): Promise<Employee> {
@@ -175,6 +402,30 @@ export class TestService {
       await this.prismaService.employees.delete({
         where: {
           id: 'zs8565',
+        },
+      });
+    }
+  }
+
+  async deleteEmployeeAndRotation(empID: string) {
+    const employee = await this.findOneEmployee(empID);
+    if (employee) {
+      const rotation = await this.prismaService.rotation.findUnique({
+        where: {
+          employeeID: empID,
+        },
+      });
+      if (rotation) {
+        await this.prismaService.rotation.delete({
+          where: {
+            employeeID: empID,
+          },
+        });
+      }
+
+      await this.prismaService.employees.delete({
+        where: {
+          id: empID,
         },
       });
     }

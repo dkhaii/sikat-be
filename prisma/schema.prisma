@@ -139,9 +139,9 @@ model EmployeeLog {
   employee Employees @relation(fields: [employeeID], references: [id])
   employeeID String @map("employee_id") @db.VarChar()
   position String @db.VarChar()
-  crew String @db.VarChar()
-  pit String @db.VarChar()
-  base String @db.VarChar()
+  crew String? @db.VarChar()
+  pit String? @db.VarChar()
+  base String? @db.VarChar()
   createdAt DateTime @map("created_at") @db.Timestamp()
 
   @@map("employee_log")

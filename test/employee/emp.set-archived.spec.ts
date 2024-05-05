@@ -7,12 +7,9 @@ import { TestModule } from '../test.module';
 import { TestService } from '../test.service';
 import { Logger } from 'winston';
 import { LoginDto } from '../../src/auth/dto/login.dto';
-import { Positions } from '../../src/employee/enums/position.enum';
-import { Pits } from '../../src/employee/enums/pit.enum';
-import { UpdateRotationDto } from '../../src/rotation/dto/update-rotation.dto';
-import { CreateRotationDto } from 'src/rotation/dto/create-rotation.dto';
+import { CreateRotationDto } from '../../src/rotation/dto/create-rotation.dto';
 
-describe('Rotation Controller - create rotation', () => {
+describe('Employee Controller - add new employee', () => {
   let app: INestApplication;
   let logger: Logger;
   let testService: TestService;
@@ -29,20 +26,16 @@ describe('Rotation Controller - create rotation', () => {
     testService = app.get(TestService);
   });
 
-  describe('POST /api/auth/rotation/set', () => {
+  describe('POST /api/auth/employees/archive', () => {
     beforeEach(async () => {
       await testService.deleteUser();
       await testService.deleteEmployee();
     });
 
-    // const empID = 'zs8565';
-
     it('should be rejected if no authenticated user', async () => {
       logger.info(
         '========== should be rejected if no authenticated user ==========',
       );
-
-      await testService.createEmployee();
 
       const loginData: LoginDto = {
         id: '111111',
@@ -51,16 +44,15 @@ describe('Rotation Controller - create rotation', () => {
       const loginResponse = await testService.loginUser(loginData);
       expect(loginResponse.token).toBeDefined();
 
-      const newRotation: UpdateRotationDto = {
-        effectiveDate: new Date(2024, 10, 5),
-        positionID: Positions.SUPERVISOR,
-        pitID: Pits.JUPITER,
+      const empID = 'd4137957-7a5f-4e2e-b545-7fa4299c90fa';
+      const endDate: CreateRotationDto = {
+        endDate: new Date(),
       };
 
       const newEmployeeResponse = await request(app.getHttpServer())
-        .post(`/api/auth/rotation/set/${1}`)
+        .patch(`/api/auth/employees/archive/${empID}`)
         .set('Authorization', '')
-        .send(newRotation);
+        .send(endDate);
       logger.info(newEmployeeResponse.body);
 
       expect(newEmployeeResponse.status).toBe(HttpStatus.UNAUTHORIZED);
@@ -73,7 +65,6 @@ describe('Rotation Controller - create rotation', () => {
       );
 
       await testService.createSupvUser();
-      const emp = await testService.createOneEmployeeWithSettedRotation();
 
       const loginData: LoginDto = {
         id: 'zs8566',
@@ -82,31 +73,23 @@ describe('Rotation Controller - create rotation', () => {
       const loginResponse = await testService.loginUser(loginData);
       expect(loginResponse.token).toBeDefined();
 
-      const newRotation: UpdateRotationDto = {
-        effectiveDate: new Date(2024, 10, 5),
-        positionID: Positions.SUPERVISOR,
-        pitID: Pits.JUPITER,
+      const empID = 'd4137957-7a5f-4e2e-b545-7fa4299c90fa';
+      const endDate: CreateRotationDto = {
+        endDate: new Date(),
       };
 
       const newEmployeeResponse = await request(app.getHttpServer())
-        .post(`/api/auth/rotation/set/${emp.id}`)
+        .patch(`/api/auth/employees/archive/${empID}`)
         .set('Authorization', `Bearer ${loginResponse.token}`)
-        .send(newRotation);
+        .send(endDate);
       logger.info(newEmployeeResponse.body);
 
       expect(newEmployeeResponse.status).toBe(HttpStatus.FORBIDDEN);
       expect(newEmployeeResponse.body.errors).toBeDefined();
-
-      await testService.deleteEmployeeAndRotation(emp.id);
     });
 
-    it('should be able to update rotation if employeeID already exist', async () => {
-      logger.info(
-        '========== should be able to update rotation if employeeID already exist ==========',
-      );
-
-      const emp = await testService.createOneEmployeeWithSettedRotation();
-      console.log(emp);
+    it('should be able to set archive date', async () => {
+      logger.info('========== should be able to set archive date ==========');
 
       const loginData: LoginDto = {
         id: '111111',
@@ -115,52 +98,19 @@ describe('Rotation Controller - create rotation', () => {
       const loginResponse = await testService.loginUser(loginData);
       expect(loginResponse.token).toBeDefined();
 
-      const newRotation: CreateRotationDto = {
-        effectiveDate: new Date(2024, 4, 6),
-        positionID: Positions.SUPERVISOR,
-        pitID: Pits.JUPITER,
+      const empID = 'd4137957-7a5f-4e2e-b545-7fa4299c90fa';
+      const endDate: CreateRotationDto = {
+        endDate: new Date(),
       };
 
       const newEmployeeResponse = await request(app.getHttpServer())
-        .post(`/api/auth/rotation/set/${emp.id}`)
+        .patch(`/api/auth/employees/archive/${empID}`)
         .set('Authorization', `Bearer ${loginResponse.token}`)
-        .send(newRotation);
+        .send(endDate);
       logger.info(newEmployeeResponse.body);
 
       expect(newEmployeeResponse.status).toBe(HttpStatus.OK);
-      expect(newEmployeeResponse.body.data.rotation.employeeID).toBe(emp.id);
-
-      await testService.deleteEmployeeAndRotation(emp.id);
-    });
-
-    it('should be able to create rotation', async () => {
-      logger.info('========== should be able to create rotation ==========');
-
-      const emp = await testService.createEmployee();
-
-      const loginData: LoginDto = {
-        id: '111111',
-        password: 'admin123',
-      };
-      const loginResponse = await testService.loginUser(loginData);
-      expect(loginResponse.token).toBeDefined();
-
-      const newRotation: UpdateRotationDto = {
-        effectiveDate: new Date(2024, 4, 6),
-        positionID: Positions.SUPERVISOR,
-        pitID: Pits.JUPITER,
-      };
-
-      const newEmployeeResponse = await request(app.getHttpServer())
-        .post(`/api/auth/rotation/set/${emp.id}`)
-        .set('Authorization', `Bearer ${loginResponse.token}`)
-        .send(newRotation);
-      logger.info(newEmployeeResponse.body);
-
-      expect(newEmployeeResponse.status).toBe(HttpStatus.OK);
-      expect(newEmployeeResponse.body.data.rotation.employeeID).toBe(emp.id);
-
-      await testService.deleteEmployeeAndRotation(emp.id);
+      expect(newEmployeeResponse.body.data.rotation).toBeDefined();
     });
   });
 });

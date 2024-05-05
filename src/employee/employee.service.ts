@@ -11,7 +11,7 @@ import { Employee } from './entities/employee.entity';
 import { CreateRotationDto } from '../rotation/dto/create-rotation.dto';
 import { RotationService } from '../rotation/rotation.service';
 import { RotationDto } from '../rotation/dto/rotation.dto';
-import { Cron } from '@nestjs/schedule';
+import { HelperService } from '../common/helper.service';
 
 @Injectable()
 export class EmployeeService {
@@ -20,6 +20,7 @@ export class EmployeeService {
     private validationService: ValidationService,
     private employeeRepository: EmployeeRepository,
     private rotationService: RotationService,
+    private helper: HelperService,
   ) {}
 
   async addNew(
@@ -32,6 +33,9 @@ export class EmployeeService {
     this.logger.info(
       `EmployeeService.create rtnDto: ${JSON.stringify(rtnDto)}`,
     );
+
+    const ct = this.helper.dateNow();
+    console.log(new Date(ct).toLocaleString());
 
     const validatedEmployeDto: AddNewEmployeeDto =
       this.validationService.validate(EmployeeValidation.ADDNEW, empDto);
@@ -106,7 +110,7 @@ export class EmployeeService {
     return employees;
   }
 
-  async updateProfile(
+  async update(
     empID: string,
     updateEmployeeDto: UpdateEmployeeDto,
   ): Promise<EmployeeDto> {
@@ -131,6 +135,11 @@ export class EmployeeService {
       profilePicture: validatedUpdateEmployeeDto.profilePicture,
       dateOfBirth: validatedUpdateEmployeeDto.dateOfBirth,
       dateOfHire: validatedUpdateEmployeeDto.dateOfHire,
+      positionID: validatedUpdateEmployeeDto.positionID,
+      crewID: validatedUpdateEmployeeDto.crewID,
+      pitID: validatedUpdateEmployeeDto.pitID,
+      baseID: validatedUpdateEmployeeDto.baseID,
+      isArchived: validatedUpdateEmployeeDto.isArchived,
       updatedAt: updatedAt,
     };
 
@@ -142,10 +151,10 @@ export class EmployeeService {
     return updatedEmployee;
   }
 
-  async archive(
+  async setArchiveDate(
     empID: string,
     rtnDto: CreateRotationDto,
-  ): Promise<[RotationDto, EmployeeDto]> {
+  ): Promise<RotationDto> {
     this.logger.info(`EmployeeService.delete ${JSON.stringify(empID)}`);
 
     const employee = await this.employeeRepository.findOneByID(empID);
@@ -158,71 +167,6 @@ export class EmployeeService {
       rtnDto,
     );
 
-    if (!endRotation) {
-      throw new HttpException(
-        'ini ada error',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
-    const archiveStatus: UpdateEmployeeDto = {
-      isArchived: true,
-    };
-
-    const updatedEmployee = await this.employeeRepository.update(
-      empID,
-      archiveStatus,
-    );
-
-    return [endRotation, updatedEmployee];
-  }
-
-  @Cron('* * 17 * * *')
-  async checkArchiveEndDate() {
-    const rotations = await this.rotationService.showAll();
-    const currentDate = new Date();
-
-    for (const rotation of rotations) {
-      if (rotation.endDate == currentDate) {
-        const updateArchiveStatus: UpdateEmployeeDto = {
-          isArchived: true,
-        };
-        await this.employeeRepository.update(
-          rotation.employeeID,
-          updateArchiveStatus,
-        );
-      }
-    }
-  }
-
-  @Cron('* * 17 * * *')
-  async checkAndUpdate() {
-    const rotations = await this.rotationService.showAll();
-    const currentDate = new Date();
-
-    for (const rotation of rotations) {
-      if (rotation.effectiveDate == currentDate) {
-        const updateEmployee: UpdateEmployeeDto = {
-          positionID: rotation.positionID,
-          crewID: rotation.crewID,
-          pitID: rotation.pitID,
-          baseID: rotation.baseID,
-        };
-
-        if (updateEmployee) {
-          await this.employeeRepository.update(
-            rotation.employeeID,
-            updateEmployee,
-          );
-        }
-
-        const updateArchiveStatus: UpdateEmployeeDto = {
-          isArchived: false,
-        };
-        await this.employeeRepository.update(
-          rotation.employeeID,
-          updateArchiveStatus,
-        );
-      }
-    }
+    return endRotation;
   }
 }
