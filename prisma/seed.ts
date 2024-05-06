@@ -136,6 +136,7 @@ async function seedRoles() {
 }
 
 async function seedUsers() {
+  await new Promise((f) => setTimeout(f, 5000));
   await prisma.users.create({
     data: defaultAdmin,
   });

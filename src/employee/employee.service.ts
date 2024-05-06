@@ -98,6 +98,17 @@ export class EmployeeService {
     return employee;
   }
 
+  async findOneByIDNoFilter(empID: string): Promise<EmployeeDto> {
+    this.logger.info(`EmployeeService.findOneByID ${JSON.stringify(empID)}`);
+
+    const employee = await this.employeeRepository.findOneByIDNoFilter(empID);
+    if (employee == null) {
+      throw new HttpException('Employee not exist', HttpStatus.NOT_FOUND);
+    }
+
+    return employee;
+  }
+
   async findByName(empName: string): Promise<EmployeeDto[]> {
     this.logger.info(`EmployeeService.findByName ${JSON.stringify(empName)}`);
     console.log(empName);

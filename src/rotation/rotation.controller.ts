@@ -67,19 +67,25 @@ export class RotationController {
   @Patch('/check/effective-date')
   @HttpCode(HttpStatus.OK)
   async checkRotationAndUpdateEmployee(): Promise<
-    WebResponse<{ employees: EmployeeDto[]; employeeLogs: EmployeeLogDto[] }>
+    WebResponse<{
+      updatedEmployeeData: EmployeeDto[];
+      unarchivedEmployeeData: EmployeeDto[];
+      createdEmployeeLogData: EmployeeLogDto[];
+    }>
   > {
-    const [empDatas, empLogDatas] =
+    const [updatedEmpData, unarchivedEmpData, createdEmpLogData] =
       await this.rotationScheduledTaskService.checkEffectiveDateAndUpdateEmployee();
 
     const response: WebResponse<{
-      employees: EmployeeDto[];
-      employeeLogs: EmployeeLogDto[];
+      updatedEmployeeData: EmployeeDto[];
+      unarchivedEmployeeData: EmployeeDto[];
+      createdEmployeeLogData: EmployeeLogDto[];
     }> = {
       message: 'success',
       data: {
-        employees: empDatas,
-        employeeLogs: empLogDatas,
+        updatedEmployeeData: updatedEmpData,
+        unarchivedEmployeeData: unarchivedEmpData,
+        createdEmployeeLogData: createdEmpLogData,
       },
     };
 

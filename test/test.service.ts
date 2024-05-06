@@ -198,8 +198,8 @@ export class TestService {
     }
   }
 
-  async createEmployeeWithEffectiveDate() {
-    const amountOfEmployees = 3;
+  async createEmployeeWithEffectiveDate(date: string) {
+    const amountOfEmployees = 2;
 
     const employees: Employee[] = [];
 
@@ -245,7 +245,7 @@ export class TestService {
         await this.prismaService.rotation.create({
           data: {
             employeeID: createdEmployee.id,
-            effectiveDate: new Date(2024, 4, 5),
+            effectiveDate: new Date(date),
             createdAt: new Date(),
             updatedAt: new Date(),
           },
@@ -254,8 +254,8 @@ export class TestService {
     }
   }
 
-  async createEmployeeWithSettedRotation() {
-    const amountOfEmployees = 3;
+  async createEmployeeWithSettedRotation(date: string) {
+    const amountOfEmployees = 2;
 
     const employees: Employee[] = [];
 
@@ -301,7 +301,7 @@ export class TestService {
         await this.prismaService.rotation.create({
           data: {
             employeeID: createdEmployee.id,
-            effectiveDate: new Date(2024, 4, 5),
+            effectiveDate: new Date(date),
             positionID: faker.helpers.enumValue(Positions),
             pitID: faker.helpers.enumValue(Pits),
             baseID: faker.helpers.enumValue(Bases),

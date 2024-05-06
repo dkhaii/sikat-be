@@ -7,6 +7,7 @@ import { CreateEmployeeLogDto } from '../employee-log/dto/create-employee-log.dt
 import { EmployeeDto } from '../employee/dto/employee.dto';
 import { EmployeeLogDto } from '../employee-log/dto/employee-log.dto';
 import { HelperService } from '../common/helper.service';
+import { RotationDto } from './dto/rotation.dto';
 
 @Injectable()
 export class RotationScheduledTaskService {
@@ -17,9 +18,7 @@ export class RotationScheduledTaskService {
     private helper: HelperService,
   ) {}
 
-  private currentDate = new Date().toLocaleString('id-ID', {
-    dateStyle: 'short',
-  });
+  private currentDate = new Date().valueOf();
 
   async checkArchiveEndDate(): Promise<EmployeeDto[]> {
     console.log('current date in rotation service: ', this.currentDate);
@@ -37,15 +36,12 @@ export class RotationScheduledTaskService {
     for (let i = 0; i < rotations.length; i++) {
       console.log(
         rotations[i].endDate &&
-          rotations[i].endDate.toLocaleString('id-ID', {
-            dateStyle: 'short',
-          }) <= this.currentDate,
+          rotations[i].endDate.valueOf() <= this.currentDate,
       );
 
       if (
         rotations[i].endDate &&
-        rotations[i].endDate.toLocaleString('id-ID', { dateStyle: 'short' }) <=
-          this.currentDate
+        rotations[i].endDate.valueOf() <= this.currentDate
       ) {
         const updateArchiveStatus: UpdateEmployeeDto = {
           isArchived: true,
@@ -70,41 +66,38 @@ export class RotationScheduledTaskService {
   }
 
   async checkEffectiveDateAndUpdateEmployee(): Promise<
-    [EmployeeDto[], EmployeeLogDto[]]
+    [EmployeeDto[], EmployeeDto[], EmployeeLogDto[]]
   > {
     const rotations = await this.rotationService.showAll();
+    console.log('isi rotations data: ', rotations);
 
     if (rotations.length == 0) {
-      return [[], []];
+      return [[], [], []];
     }
 
-    const employees: EmployeeDto[] = [];
-    const empLogs: EmployeeLogDto[] = [];
+    const updatedEmployeeData: EmployeeDto[] = [];
+    const unarchivedEmployeeData: EmployeeDto[] = [];
+    const createdEmployeeLogData: EmployeeLogDto[] = [];
 
     for (let i = 0; i < rotations.length; i++) {
-      const updateEmpDto: UpdateEmployeeDto = {
-        positionID: rotations[i].positionID,
-        crewID: rotations[i].crewID,
-        pitID: rotations[i].pitID,
-        baseID: rotations[i].baseID,
-      };
+      console.log(rotations[i].effectiveDate.valueOf() == new Date().valueOf());
+      const updateEmpDto = this.validateNotNullRotation(rotations[i]);
+      console.log('isi dto update employee: ', updateEmpDto);
 
-      const oldEmployeeData = await this.employeeService.findOneByID(
+      const oldEmployeeData = await this.employeeService.findOneByIDNoFilter(
         rotations[i].employeeID,
       );
-
+      console.log('isi old employee: ', oldEmployeeData);
       if (
         rotations[i].effectiveDate &&
-        rotations[i].effectiveDate.toLocaleString('id-ID', {
-          dateStyle: 'short',
-        }) == this.currentDate
+        rotations[i].effectiveDate.valueOf() <= this.currentDate
       ) {
-        if (updateEmpDto) {
+        if (Object.keys(updateEmpDto).length > 0) {
           const updatedEmployee = await this.employeeService.update(
             rotations[i].employeeID,
             updateEmpDto,
           );
-
+          console.log('updated employee: ', updatedEmployee);
           if (updatedEmployee) {
             const createdAt = this.helper.dateNow();
             const employeeLog: CreateEmployeeLogDto = {
@@ -115,21 +108,22 @@ export class RotationScheduledTaskService {
               base: oldEmployeeData.baseName,
               createdAt: createdAt,
             };
-
+            console.log('isi employee log: ', employeeLog);
             const createdEmployeeLog =
               await this.employeeLogService.create(employeeLog);
-
+            console.log('isi created employee log: ', createdEmployeeLog);
             if (createdEmployeeLog) {
               await this.rotationService.remove(rotations[i].employeeID);
-
-              empLogs.push(createdEmployeeLog);
+              createdEmployeeLogData.push(createdEmployeeLog);
             }
-
-            employees.push(updatedEmployee);
+            updatedEmployeeData.push(updatedEmployee);
           }
         }
 
-        if (oldEmployeeData.isArchived && oldEmployeeData.isArchived == true) {
+        if (
+          Object.keys(updateEmpDto).length == 0 &&
+          oldEmployeeData.isArchived == true
+        ) {
           const updateArchiveStatus: UpdateEmployeeDto = {
             isArchived: false,
           };
@@ -137,23 +131,52 @@ export class RotationScheduledTaskService {
             rotations[i].employeeID,
             updateArchiveStatus,
           );
+          console.log(
+            'isi updated employee archived status: ',
+            updatedArchivedStatus,
+          );
           if (updatedArchivedStatus) {
             await this.rotationService.remove(rotations[i].employeeID);
 
-            employees.push(updatedArchivedStatus);
+            unarchivedEmployeeData.push(updatedArchivedStatus);
           }
         }
-
-        if (
-          rotations[i].effectiveDate.toLocaleString('id-ID', {
-            dateStyle: 'short',
-          }) !== this.currentDate
-        ) {
-          return [[], []];
-        }
+      }
+      if (
+        rotations[i].effectiveDate &&
+        rotations[i].effectiveDate.valueOf() <= this.currentDate == false
+      ) {
+        return [[], [], []];
       }
     }
 
-    return [employees, empLogs];
+    console.log('updated employee data: ', updatedEmployeeData);
+    console.log('unarchived employee data: ', unarchivedEmployeeData);
+    console.log('created employee log data: ', createdEmployeeLogData);
+
+    return [
+      updatedEmployeeData,
+      unarchivedEmployeeData,
+      createdEmployeeLogData,
+    ];
+  }
+
+  private validateNotNullRotation(rotation: RotationDto): UpdateEmployeeDto {
+    const updateEmpDto: UpdateEmployeeDto = {};
+
+    if (rotation.positionID !== null) {
+      updateEmpDto.positionID = rotation.positionID;
+    }
+    if (rotation.crewID !== null) {
+      updateEmpDto.crewID = rotation.crewID;
+    }
+    if (rotation.pitID !== null) {
+      updateEmpDto.pitID = rotation.pitID;
+    }
+    if (rotation.baseID !== null) {
+      updateEmpDto.baseID = rotation.baseID;
+    }
+
+    return updateEmpDto;
   }
 }

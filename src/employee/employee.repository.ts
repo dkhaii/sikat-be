@@ -77,6 +77,28 @@ export class EmployeeRepository {
     return null;
   }
 
+  async findOneByIDNoFilter(empID: string): Promise<EmployeeDto | null> {
+    const employee = await this.prismaService.employees.findUnique({
+      where: {
+        id: empID,
+      },
+      include: {
+        position: true,
+        crew: true,
+        pit: true,
+        base: true,
+      },
+    });
+
+    if (!employee) {
+      return null;
+    }
+
+    const employeeDto = await this.mapEntityToDto(employee);
+
+    return employeeDto;
+  }
+
   async countSameID(empID: string): Promise<number> {
     const employeeIDs = await this.prismaService.employees.count({
       where: {
