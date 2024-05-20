@@ -7,6 +7,8 @@ import { TestModule } from '../test.module';
 import { TestService } from '../test.service';
 import { Logger } from 'winston';
 import { LoginDto } from '../../src/auth/dto/login.dto';
+import { EmployeeLogDto } from 'src/employee-log/dto/employee-log.dto';
+import { EmployeeDto } from 'src/employee/dto/employee.dto';
 
 describe('Rotation Controller - create rotation', () => {
   let app: INestApplication;
@@ -82,6 +84,75 @@ describe('Rotation Controller - create rotation', () => {
       expect(response.body.data.createdEmployeeLogData).toBeDefined();
 
       jest.useRealTimers();
+    });
+
+    it('should be able to return empty array when no records in database', async () => {
+      logger.info(
+        '========== should be able to return empty array when no records in database ==========',
+      );
+
+      const loginData: LoginDto = {
+        id: '111111',
+        password: 'admin123',
+      };
+      const loginResponse = await testService.loginUser(loginData);
+      expect(loginResponse.token).toBeDefined();
+
+      const response = await request(app.getHttpServer())
+        .patch(`/api/auth/rotation/check/effective-date`)
+        .set('Authorization', `Bearer ${loginResponse.token}`);
+      logger.info(response.body);
+
+      const mockEmptyUpdatedEmployeeData: EmployeeDto[] = [];
+      const mockEmptyUnarchivedEmployeeData: EmployeeDto[] = [];
+      const mockEmptyCreatedEmployeeLogData: EmployeeLogDto[] = [];
+
+      expect(response.status).toBe(HttpStatus.OK);
+      expect(response.body.data.updatedEmployeeData).toEqual(
+        mockEmptyUpdatedEmployeeData,
+      );
+      expect(response.body.data.unarchivedEmployeeData).toEqual(
+        mockEmptyUnarchivedEmployeeData,
+      );
+      expect(response.body.data.createdEmployeeLogData).toEqual(
+        mockEmptyCreatedEmployeeLogData,
+      );
+    });
+
+    it('should be able to return empty array when no effective date matches', async () => {
+      logger.info(
+        '========== should be able to return empty array when no effective date matches ==========',
+      );
+
+      await testService.createEmployeeWithSettedRotation('2024-5-10');
+      await testService.createEmployeeWithEffectiveDate('2024-5-10');
+
+      const loginData: LoginDto = {
+        id: '111111',
+        password: 'admin123',
+      };
+      const loginResponse = await testService.loginUser(loginData);
+      expect(loginResponse.token).toBeDefined();
+
+      const response = await request(app.getHttpServer())
+        .patch(`/api/auth/rotation/check/effective-date`)
+        .set('Authorization', `Bearer ${loginResponse.token}`);
+      logger.info(response.body);
+
+      const mockEmptyUpdatedEmployeeData: EmployeeDto[] = [];
+      const mockEmptyUnarchivedEmployeeData: EmployeeDto[] = [];
+      const mockEmptyCreatedEmployeeLogData: EmployeeLogDto[] = [];
+
+      expect(response.status).toBe(HttpStatus.OK);
+      expect(response.body.data.updatedEmployeeData).toEqual(
+        mockEmptyUpdatedEmployeeData,
+      );
+      expect(response.body.data.unarchivedEmployeeData).toEqual(
+        mockEmptyUnarchivedEmployeeData,
+      );
+      expect(response.body.data.createdEmployeeLogData).toEqual(
+        mockEmptyCreatedEmployeeLogData,
+      );
     });
   });
 });

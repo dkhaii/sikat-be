@@ -81,6 +81,8 @@ CREATE TABLE "leave_plan" (
     "start_date" DATE NOT NULL,
     "end_date" DATE NOT NULL,
     "leave_status_id" INTEGER NOT NULL,
+    "is_approved" BOOLEAN NOT NULL DEFAULT false,
+    "form_file" TEXT,
     "created_at" TIMESTAMP NOT NULL,
     "updated_at" TIMESTAMP NOT NULL,
 
@@ -118,9 +120,6 @@ CREATE TABLE "employee_log" (
 
 -- CreateIndex
 CREATE UNIQUE INDEX "employees_id_key" ON "employees"("id");
-
--- CreateIndex
-CREATE UNIQUE INDEX "leave_plan_leave_status_id_key" ON "leave_plan"("leave_status_id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "rotation_employee_id_key" ON "rotation"("employee_id");

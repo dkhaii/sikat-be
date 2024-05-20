@@ -180,12 +180,8 @@ export class EmployeeRepository {
       id: employee.id,
       name: employee.name,
       profilePicture: employee.profilePicture,
-      dateOfBirthStr: employee.dateOfBirth.toLocaleString('id-ID', {
-        dateStyle: 'short',
-      }),
-      dateOfHireStr: employee.dateOfHire.toLocaleString('id-ID', {
-        dateStyle: 'short',
-      }),
+      dateOfBirthStr: employee.dateOfBirth.toLocaleDateString(),
+      dateOfHireStr: employee.dateOfHire.toLocaleDateString(),
       positionName: employee.position.name,
       crewName: employee.crew.name,
       pitName: employee.pit.name,

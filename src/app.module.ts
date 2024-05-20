@@ -5,6 +5,7 @@ import { AuthModule } from './auth/auth.module';
 import { EmployeeModule } from './employee/employee.module';
 import { RotationModule } from './rotation/rotation.module';
 import { EmployeeLogModule } from './employee-log/employee-log.module';
+import { LeavePlanModule } from './leave-plan/leave-plan.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { EmployeeLogModule } from './employee-log/employee-log.module';
     EmployeeModule,
     RotationModule,
     EmployeeLogModule,
+    LeavePlanModule,
   ],
 })
 export class AppModule {}

@@ -95,7 +95,7 @@ model Positions {
 model LeaveStatus {
   id Int @id
   name String @db.VarChar()
-  leavePlan LeavePlan?
+  leavePlan LeavePlan[]
 
   @@map("leave_status")
 }
@@ -106,8 +106,10 @@ model LeavePlan {
   employeeID String @map("employee_id") @db.VarChar()
   startDate DateTime @map("start_date") @db.Date()
   endDate DateTime @map("end_date") @db.Date()
-  status LeaveStatus @relation(fields: [leaveStatusID], references: [id])
-  leaveStatusID Int @map("leave_status_id") @unique
+  leaveStatus LeaveStatus @relation(fields: [leaveStatusID], references: [id])
+  leaveStatusID Int @map("leave_status_id")
+  isApproved Boolean @map("is_approved") @db.Boolean @default(false)
+  formCuti String? @map("form_file") @db.Text
   createdAt DateTime @map("created_at") @db.Timestamp()
   updatedAt DateTime @map("updated_at") @db.Timestamp()
 

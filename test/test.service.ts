@@ -96,16 +96,16 @@ export class TestService {
       },
     });
 
-    if (employee) {
-      await this.prismaService.rotation.create({
-        data: {
-          employeeID: 'zs8565',
-          effectiveDate: new Date(),
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-      });
-    }
+    // if (employee) {
+    //   await this.prismaService.rotation.create({
+    //     data: {
+    //       employeeID: 'zs8565',
+    //       effectiveDate: new Date(),
+    //       createdAt: new Date(),
+    //       updatedAt: new Date(),
+    //     },
+    //   });
+    // }
 
     return employee;
   }
