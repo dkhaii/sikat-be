@@ -124,6 +124,24 @@ const leaveStatus = [
   },
 ];
 
+const workShifts = [
+  {
+    name: 'day',
+    startTime: new Date(new Date().setHours(7, 0, 0, 0)),
+    endTime: new Date(new Date().setHours(19, 0, 0, 0)),
+    duration: 12,
+  },
+  {
+    name: 'night',
+    startTime: new Date(new Date().setHours(19, 0, 0, 0)),
+    endTime: new Date(new Date().setHours(7, 0, 0, 0)),
+    duration: 12,
+  },
+  {
+    name: 'off',
+  },
+];
+
 async function seedRoles() {
   for (const role of roles) {
     await prisma.roles.create({
@@ -241,6 +259,19 @@ async function seedLeaveStatus() {
   }
 }
 
+async function seedWorkShift() {
+  for (const workShift of workShifts) {
+    await prisma.workShift.create({
+      data: {
+        name: workShift.name,
+        startTime: workShift.startTime,
+        endTime: workShift.endTime,
+        duration: workShift.duration,
+      },
+    });
+  }
+}
+
 seedRoles()
   .then(async () => {
     await prisma.$disconnect;
@@ -312,6 +343,16 @@ seedEmployees()
   });
 
 seedLeaveStatus()
+  .then(async () => {
+    await prisma.$disconnect;
+  })
+  .catch(async (error) => {
+    console.log(error);
+    await prisma.$disconnect;
+    // process.exit(1);
+  });
+
+seedWorkShift()
   .then(async () => {
     await prisma.$disconnect;
   })

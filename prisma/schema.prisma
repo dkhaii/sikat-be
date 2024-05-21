@@ -16,8 +16,8 @@ datasource db {
 model Roles {
   id Int @id 
   roleName String @map("role_name") @db.VarChar() 
-  users Users[]
 
+  users Users[]
   @@map("roles")
 }
 
@@ -25,9 +25,9 @@ model Users {
   id String @id 
   password String @db.VarChar()
   name String @db.VarChar()
-  role Roles @relation(fields: [roleID], references: [id])
   roleID Int @map("role_id") 
   
+  role Roles @relation(fields: [roleID], references: [id])
   @@map("users")
 }
 
@@ -37,108 +37,107 @@ model Employees {
   profilePicture String? @map("profile_picture") @db.VarChar() 
   dateOfBirth DateTime @map("date_of_birth") @db.Date
   dateOfHire DateTime @map("date_of_hire") @db.Date
-  position Positions @relation(fields: [positionID], references: [id])
   positionID Int @map("position_id") 
-  crew Crews? @relation(fields: [crewID], references: [id])
   crewID Int? @map("crew_id")
-  pit Pits? @relation(fields: [pitID], references: [id])
   pitID Int? @map("pit_id")
-  base Bases? @relation(fields: [baseID], references: [id])
   baseID Int? @map("base_id")
   isArchived Boolean @map("is_archived") @db.Boolean @default(true)
   createdAt DateTime @map("created_at") @db.Timestamp()
   updatedAt DateTime @map("updated_at") @db.Timestamp()
 
+  position Positions @relation(fields: [positionID], references: [id])
+  crew Crews? @relation(fields: [crewID], references: [id])
+  pit Pits? @relation(fields: [pitID], references: [id])
+  base Bases? @relation(fields: [baseID], references: [id])
   leavePlan LeavePlan[]
   rotation Rotation?
   employeeLog EmployeeLog[]
-
   @@map("employees")
 }
 
 model Pits {
   id Int @id
   name String @db.VarChar()
+
   employees Employees[]
   rotation Rotation[]
-
   @@map("pits")
 }
 
 model Bases {
   id Int @id 
   name String @db.VarChar()
+
   employees Employees[]
   rotation Rotation[]
-
   @@map("bases")
 }
 
 model Crews {
   id Int @id 
   name String @db.VarChar()
+  
   employees Employees[]
   rotation Rotation[]
-
+  shiftRoster ShiftRoster[]
   @@map("crews")
 }
 
 model Positions {
   id Int @id 
   name String @db.VarChar()
+
   employees Employees[]
   rotation Rotation[]
-
   @@map("positions")
 }
 
 model LeaveStatus {
   id Int @id
   name String @db.VarChar()
-  leavePlan LeavePlan[]
 
+  leavePlan LeavePlan[]
   @@map("leave_status")
 }
 
 model LeavePlan {
   id Int @id @default(autoincrement())
-  employee Employees @relation(fields: [employeeID], references: [id])
   employeeID String @map("employee_id") @db.VarChar()
   startDate DateTime @map("start_date") @db.Date()
   endDate DateTime @map("end_date") @db.Date()
-  leaveStatus LeaveStatus @relation(fields: [leaveStatusID], references: [id])
   leaveStatusID Int @map("leave_status_id")
   isApproved Boolean @map("is_approved") @db.Boolean @default(false)
   formCuti String? @map("form_file") @db.Text
   createdAt DateTime @map("created_at") @db.Timestamp()
   updatedAt DateTime @map("updated_at") @db.Timestamp()
 
+  employee Employees @relation(fields: [employeeID], references: [id])
+  leaveStatus LeaveStatus @relation(fields: [leaveStatusID], references: [id])
   @@map("leave_plan")
 }
 
 model Rotation {
   id Int @id @default(autoincrement())
-  employee Employees @relation(fields: [employeeID], references: [id])
   employeeID String @map("employee_id") @db.VarChar() @unique
   effectiveDate DateTime? @map("effective_date") @db.Date
   endDate DateTime? @map("end_date") @db.Date
-  position Positions? @relation(fields: [positionID], references: [id])
   positionID Int? @map("position_id")
-  crew Crews? @relation(fields: [crewID], references: [id])
   crewID Int? @map("crew_id")
-  pit Pits? @relation(fields: [pitID], references: [id])
   pitID Int? @map("pit_id")
-  base Bases? @relation(fields: [baseID], references: [id])
   baseID Int? @map("base_id")
   createdAt DateTime @map("created_at") @db.Timestamp()
   updatedAt DateTime @map("updated_at") @db.Timestamp()
 
+  employee Employees @relation(fields: [employeeID], references: [id])
+  position Positions? @relation(fields: [positionID], references: [id])
+  crew Crews? @relation(fields: [crewID], references: [id])
+  pit Pits? @relation(fields: [pitID], references: [id])
+  base Bases? @relation(fields: [baseID], references: [id])
   @@map("rotation")
 }
 
 model EmployeeLog {
   id Int @id @default(autoincrement())
-  employee Employees @relation(fields: [employeeID], references: [id])
   employeeID String @map("employee_id") @db.VarChar()
   position String @db.VarChar()
   crew String? @db.VarChar()
@@ -146,5 +145,27 @@ model EmployeeLog {
   base String? @db.VarChar()
   createdAt DateTime @map("created_at") @db.Timestamp()
 
+  employee Employees @relation(fields: [employeeID], references: [id])
   @@map("employee_log")
+}
+
+model WorkShift {
+  id Int @id @default(autoincrement())
+  name String @db.VarChar()
+  startTime DateTime? @db.Time() 
+  endTime DateTime? @db.Time()
+  duration Int? @db.Integer
+
+  shiftRoster ShiftRoster[]
+  @@map("work_shift")
+}
+
+model ShiftRoster {
+  id Int @id @default(autoincrement())
+  workShiftID Int @db.Integer
+  crewID Int @db.Integer
+
+  workShift WorkShift @relation(fields: [workShiftID], references: [id])
+  crew Crews @relation(fields: [crewID], references: [id])
+  @@map("shift_roster")
 }
